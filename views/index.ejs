@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>URL Shortner</title>
+  </head>
+  <body>
+    <%- include("./partials/navbar"); %>
+    <div class="main-container">
+      <div class="container">
+        <% if (isLoggedIn) { %>
+        <h2>Logged In</h2>
+        <% } else { %>
+        <h2>You are not Logged In</h2>
+        <% } %>
+        <h1>URL Shortner</h1>
+        <form action="/shorten" method="POST">
+          <div class="url-input">
+            <label for="url">Enter URL : </label>
+            <br />
+            <input
+              type="url"
+              name="url"
+              id="url"
+              required
+              placeholder="www.youtube.com"
+            />
+          </div>
+
+          <div class="code-input">
+            <label for="code">Enter Shortnen Code : </label>
+            <br />
+            <input
+              type="text"
+              name="shortCode"
+              id="shortCode"
+              required
+              placeholder="youtube"
+            />
+          </div>
+
+          <button id="shortenBtn" type="submit">Shorten</button>
+        </form>
+        <h2>Shortened URL's</h2>
+        <ul id="shortened_urls">
+          <% const list = Links %> <% const newList = list.slice(-5).reverse()
+          %> <% newList.map(({shortCode, url}) => { %> <% const newURL =
+          url.length >= 40 ? url.slice(0, 40) + "..." : url; %>
+          <li>
+            <a href="/<%= shortCode%>" target="_blank">
+              <%= host %> / <%= shortCode %>
+            </a>
+            <br />
+            <%= newURL %>
+          </li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
