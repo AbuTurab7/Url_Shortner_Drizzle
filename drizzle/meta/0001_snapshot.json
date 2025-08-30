@@ -1,11 +1,11 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "1f3f7d66-fa68-47b2-8a67-f9819e116b30",
-  "prevId": "f28c0aa8-2d94-4691-a809-02ecb02d5019",
+  "id": "4a44aff9-1d79-432b-8b22-49bc54e0f36c",
+  "prevId": "58ad8667-510c-47d1-ad36-934a64d9b7d6",
   "tables": {
-    "url_shortner_table_drizzle": {
-      "name": "url_shortner_table_drizzle",
+    "url_shortner_table_drz": {
+      "name": "url_shortner_table_drz",
       "columns": {
         "id": {
           "name": "id",
@@ -32,16 +32,16 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "url_shortner_table_drizzle_id": {
-          "name": "url_shortner_table_drizzle_id",
+        "url_shortner_table_drz_id": {
+          "name": "url_shortner_table_drz_id",
           "columns": [
             "id"
           ]
         }
       },
       "uniqueConstraints": {
-        "url_shortner_table_drizzle_shortCode_unique": {
-          "name": "url_shortner_table_drizzle_shortCode_unique",
+        "url_shortner_table_drz_shortCode_unique": {
+          "name": "url_shortner_table_drz_shortCode_unique",
           "columns": [
             "shortCode"
           ]

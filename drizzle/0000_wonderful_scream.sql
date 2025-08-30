@@ -1,7 +1,0 @@
--- CREATE TABLE `url_shortner_table` (
--- 	`id` int AUTO_INCREMENT NOT NULL,
--- 	`url` varchar(255) NOT NULL,
--- 	`shortCode` varchar(255) NOT NULL,
--- 	CONSTRAINT `url_shortner_table_id` PRIMARY KEY(`id`),
--- 	CONSTRAINT `url_shortner_table_shortCode_unique` UNIQUE(`shortCode`)
--- );

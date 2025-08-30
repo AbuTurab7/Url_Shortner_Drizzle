@@ -10,6 +10,7 @@ export const getShortenURL = async (req, res) => {
 export const shortener = async (req, res) => {
   const { url , shortCode } = req.body;
  const Links = await getShortLinks(shortCode);
+
  
   if (Links.length > 0) {
     return res.send(`
@@ -33,9 +34,9 @@ export const shortener = async (req, res) => {
 export const redirectURL = async (req, res) => {
   try {
     const { shortCode } = req.params;
-    const link = await getShortLinks(shortCode);
+    const [link] = await getShortLinks(shortCode);
     if (!link || link.length === 0) return res.redirect("/404");
-    return res.redirect(link[0].url);
+    return res.redirect(link.url);
   } catch (error) {
     console.log(error);
   }
