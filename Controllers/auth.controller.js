@@ -1,5 +1,5 @@
 
-import { createUser , getUserByEmail , getHashPassword , comparePassword } from "../services/auth.services.controller.js";
+import { createUser , getUserByEmail , getHashPassword , comparePassword , getToken } from "../services/auth.services.controller.js";
 
 export const getRegister =  (req , res) => {
   return  res.render("auth/register");
@@ -38,7 +38,13 @@ export const postlogin = async (req , res) => {
       </script>
       `));
   }
-res.cookie("isLoggedIn", "true");
+  const token = getToken({
+    id : user.id,
+    name : user.name,
+    email : user.email
+  });
+// res.cookie("isLoggedIn", "true");
+res.cookie("access_token", token);
     res.redirect("/");
 }
 

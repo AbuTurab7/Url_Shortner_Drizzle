@@ -1,8 +1,10 @@
 import { db } from "../config/db-client.js";
 import { eq , and } from "drizzle-orm";
 import { users } from "../drizzle/schema.js";
-import bcrypt from "bcrypt";
+// import bcrypt from "bcrypt";
 import argon2 from "argon2";
+import jwt from "jsonwebtoken";
+
 
 export const getUserByEmail = async (email) => {
     return await db.select().from(users).where(eq(users.email , email));
@@ -22,4 +24,12 @@ export const getHashPassword = async (password) => {
 export const comparePassword = async (password , hashPassword) => {
     // return await bcrypt.compare(password , hashPassword);
     return await argon2.verify( hashPassword , password );
+}
+
+export const getToken = ({id , name , email }) => {
+    return jwt.sign({id , name , email} , process.env.JWT_KEY , { expiresIn : "30d"});
+}
+
+export const verifyToken =  (token) => {
+    return jwt.verify(token , process.env.JWT_KEY);
 }
