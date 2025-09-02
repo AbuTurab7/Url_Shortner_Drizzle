@@ -1,5 +1,5 @@
 
-import { createUser , getUserByEmail  } from "../services/auth.services.controller.js";
+import { createUser , getUserByEmail , getHashPassword , comparePassword } from "../services/auth.services.controller.js";
 
 export const getRegister =  (req , res) => {
   return  res.render("auth/register");
@@ -15,12 +15,11 @@ export const postRegister = async (req , res) => {
       window.location.href = "/login";
     </script>
   `));
-  
- await createUser({name , email , password});
+  const hashedPassword = await getHashPassword(password);
+ await createUser({name , email , password : hashedPassword });
   
   res.redirect("/login");
 }
-
 
 export const getLogin =  (req , res) => {
  return  res.render("auth/login");
@@ -29,8 +28,9 @@ export const getLogin =  (req , res) => {
 export const postlogin = async (req , res) => {
   const { email , password } = req.body;
   const [ user ] = await getUserByEmail(email);  
-  console.log( user );
-  if(!user || user.password !== password){
+  const isPasswordValid = await comparePassword(password , user.password );
+
+  if(!user || !isPasswordValid){
     return ( res.send(`
       <script>
       alert("Email or password is incorrect, Try Again!");
