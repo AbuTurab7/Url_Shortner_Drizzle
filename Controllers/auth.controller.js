@@ -1,5 +1,5 @@
 
-import { createUser , getUserByEmail } from "../services/auth.services.controller.js";
+import { createUser , getUserByEmail  } from "../services/auth.services.controller.js";
 
 export const getRegister =  (req , res) => {
   return  res.render("auth/register");
@@ -26,8 +26,19 @@ export const getLogin =  (req , res) => {
  return  res.render("auth/login");
 }
 
-export const postlogin =  (req , res) => {
- res.cookie("isLoggedIn", "true");
- res.redirect("/");
+export const postlogin = async (req , res) => {
+  const { email , password } = req.body;
+  const [ user ] = await getUserByEmail(email);  
+  console.log( user );
+  if(!user || user.password !== password){
+    return ( res.send(`
+      <script>
+      alert("Email or password is incorrect, Try Again!");
+      window.location.href="/login";
+      </script>
+      `));
+  }
+res.cookie("isLoggedIn", "true");
+    res.redirect("/");
 }
 

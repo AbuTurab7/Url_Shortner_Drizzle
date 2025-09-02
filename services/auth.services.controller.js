@@ -1,5 +1,5 @@
 import { db } from "../config/db-client.js";
-import { eq } from "drizzle-orm";
+import { eq , and } from "drizzle-orm";
 import { users } from "../drizzle/schema.js";
 
 export const getUserByEmail = async (email) => {
