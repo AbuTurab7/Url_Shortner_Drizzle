@@ -3,67 +3,98 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="/style.css" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <title>URL Shortner</title>
+    <title>URL Shortener</title>
   </head>
   <body>
     <%- include("./partials/navbar"); %>
-    <div class="main-container">
+
+    <main class="main-container">
       <div class="container">
-        <% if (user) { %>
-        <h2>Logged In</h2>
-        <% } else { %>
-        <h2>You are not Logged In</h2>
-        <% } %>
-        <h1>URL Shortner</h1>
-        <form action="/shorten" method="POST">
-          <div class="url-input">
-            <label for="url">Enter URL : </label>
-            <br />
+        <section class="hero">
+        <h1>🔗 URL Shortener</h1>
+      </section>
+
+      <section class="form-card">
+        <form action="/shorten" method="POST" class="shorten-form">
+          <div class="form-group">
+            <label for="url">Enter URL</label>
             <input
               type="url"
               name="url"
               id="url"
               required
-              placeholder="www.youtube.com"
+              placeholder="https://www.youtube.com"
             />
           </div>
 
-          <div class="code-input">
-            <label for="code">Enter Shortnen Code : </label>
-            <br />
+          <div class="form-group">
+            <label for="shortCode">Custom Short Code</label>
             <input
               type="text"
               name="shortCode"
               id="shortCode"
               required
-              placeholder="youtube"
+              placeholder="youtube123"
             />
           </div>
 
-          <button id="shortenBtn" type="submit">Shorten</button>
+          <button id="shortenBtn" type="submit" class="btn-primary">
+            🚀 Shorten
+          </button>
         </form>
-        <h2>Shortened URL's</h2>
-        <ul id="shortened_urls">
+      </section>
+
+      <section class="links-card">
+        <h2>📌 Recent Shortened URLs</h2>
+        <ul id="shortened_urls" class="links-list">
           <% const list = Links %> <% const newList = list.slice(-5).reverse()
           %> <% newList.map(({shortCode, url}) => { %> <% const newURL =
           url.length >= 40 ? url.slice(0, 40) + "..." : url; %>
-          <li>
-            <a href="/<%= shortCode%>" target="_blank">
-              <%= host %> / <%= shortCode %>
+          <li class="link-item">
+            <a href="/<%= shortCode %>" target="_blank">
+              <%= host %>/<%= shortCode %>
             </a>
-            <br />
-            <%= newURL %>
+            <div class="link-actions">
+              <span class="full-url" title="<%= url %>"><%= newURL %></span>
+              <button class="copy-btn" data-url="<%= host %>/<%= shortCode %>">
+                📋 Copy
+              </button>
+            </div>
           </li>
           <% }) %>
         </ul>
+      </section>
       </div>
-    </div>
+    </main>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const copyButtons = document.querySelectorAll(".copy-btn");
+
+        copyButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const url = btn.getAttribute("data-url");
+            navigator.clipboard
+              .writeText(url)
+              .then(() => {
+                btn.textContent = "✅ Copied!";
+                btn.style.backgroundColor = "#10b981"; // green success color
+
+                setTimeout(() => {
+                  btn.textContent = "📋 Copy";
+                  btn.style.backgroundColor = "#3b82f6";
+                }, 1500);
+              })
+              .catch((err) => {
+                alert("Failed to copy: " + err);
+              });
+          });
+        });
+      });
+    </script>
   </body>
 </html>

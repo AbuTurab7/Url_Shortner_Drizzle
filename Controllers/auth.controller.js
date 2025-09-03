@@ -50,7 +50,8 @@ res.cookie("access_token", token);
 
 export const getProfile = (req , res) => {
   if(!req.user) return res.send(`<h1>You are not logged in</h1>`);
-  res.send(`<h1>Hey! ${req.user.name} , ${req.user.email} </h1>`);
+  res.render("auth/profile");
+  // res.send(`<h1>Hey! ${req.user.name} , ${req.user.email} </h1>`);
 } 
 
 export const getLogout = (req , res) => {

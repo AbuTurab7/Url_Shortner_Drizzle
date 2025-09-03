@@ -1,30 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
   <%- include("../partials/navbar") %>
+
   <div class="auth-main-container">
     <div class="auth-container">
-    <h2>Login</h2>
-    <form action="/login" method="POST">
-      <div class="auth-input-box">
-        <input type="email" name="email" id="email" placeholder="Email" required>
-      </div>
-      <div class="input-box">
-        <input type="password" name="password" , id="password" placeholder="Password" required>
-      </div>
-      <button type="submit" class="auth-btn">Login</button>
-      <div class="auth-links">
-        <a href="#">Forgot Password?</a> | 
-        <a href="/register">Sign Up</a>
-      </div>
-    </form>
-  </div>
+      <h2 class="auth-title">Welcome Back 👋</h2>
+      <p class="auth-subtitle">Login to continue to <strong>URLShort</strong></p>
+      
+      <form action="/login" method="POST" class="auth-form">
+        <div class="auth-input-box">
+          <input type="email" name="email" id="email" placeholder="Email" required />
+        </div>
+        <div class="auth-input-box">
+          <input type="password" name="password" id="password" placeholder="Password" required />
+        </div>
+        
+        <button type="submit" class="auth-btn">Login</button>
+        
+        <div class="auth-links">
+          <a href="#" class="link">Forgot Password?</a>
+          <span>|</span>
+          <a href="/register" class="link">Sign Up</a>
+        </div>
+      </form>
+    </div>
   </div>
 </body>
 </html>

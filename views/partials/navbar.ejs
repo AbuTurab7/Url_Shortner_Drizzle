@@ -1,25 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Navbar Example</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <nav class="navbar">
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="/" class="logo">URLShortner</a>
     <ul class="nav-links">
       <li><a href="/">Home</a></li>
-      <li><a href="/">About</a></li>
-      <li><a href="/">Contact Us</a></li>
-      <% if(user) { %>
-      <li><a href="/profile">Profile</a></li>
-      <li><a href="/logout">Logout</a></li>
-     <% } else { %>
-        <li><a href="/register">Register</a></li>
-      <li><a href="/login">Login</a></li>
+      <% if (user) { %>
+        <li><a href="/profile">Profile</a></li>
+        <li><a href="/logout" class="btn-logout">Logout</a></li>
+      <% } else { %>
+        <li><a href="/register" class="btn-register">Register</a></li>
+        <li><a href="/login" class="btn-login">Login</a></li>
       <% } %>
     </ul>
-  </nav>
-</body>
-</html>
+  </div>
+</nav>
