@@ -14,9 +14,14 @@ const staticPath = join(import.meta.dirname, "public");
 app.use(express.static(staticPath));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(verifyAuthentication);
+app.use((req , res , next) => {
+  res.locals.user = req.user;
+  return next();
+});
 app.use(authRouter);
 app.use(router);
-app.use(verifyAuthentication);
+
 
 const PORT = env.PORT;
 app.listen(PORT, () => {

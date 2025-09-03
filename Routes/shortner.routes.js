@@ -9,4 +9,5 @@ router.get("/", getShortenURL );
 
 router.get("/:shortCode", redirectURL);
 
+
 export default router;

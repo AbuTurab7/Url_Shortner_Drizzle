@@ -3,8 +3,7 @@ import { saveToFile , getLinks , getShortLinks} from "../services/services.contr
 
 export const getShortenURL = async (req, res) => {
   const Links = await getLinks();
-  const isLoggedIn = req.cookies.isLoggedIn;
-  res.render("index", { Links, host: req.host , isLoggedIn });
+  res.render("index", { Links, host: req.host });
 };
 
 export const shortener = async (req, res) => {

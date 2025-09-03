@@ -43,8 +43,12 @@ export const postlogin = async (req , res) => {
     name : user.name,
     email : user.email
   });
-// res.cookie("isLoggedIn", "true");
+
 res.cookie("access_token", token);
     res.redirect("/");
 }
 
+export const getProfile = (req , res) => {
+  if(!req.user) return res.send(`<h1>You are not logged in</h1>`);
+  res.send(`<h1>Hey! ${req.user.name} , ${req.user.email} </h1>`);
+} 

@@ -16,7 +16,7 @@
     <%- include("./partials/navbar"); %>
     <div class="main-container">
       <div class="container">
-        <% if (isLoggedIn) { %>
+        <% if (user) { %>
         <h2>Logged In</h2>
         <% } else { %>
         <h2>You are not Logged In</h2>
