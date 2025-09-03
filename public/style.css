@@ -98,7 +98,12 @@ body {
   width: 60%;
   transition: transform 0.2s ease;
 }
-
+.notlogged{
+  border: 2px solid red;
+}
+.islogged{
+  border: 2px solid green;
+}
 .container:hover {
   transform: translateY(-2px);
 }
@@ -325,6 +330,14 @@ form {
   transform: translateY(-1px);
 }
 
+.flash-error{
+  width: 100%;
+   background-color: rgba(239, 68, 68, 0.1);
+  border-left: 4px solid rgb(187, 78, 78);
+  color: rgb(174, 78, 78);
+  padding: 8px 15px 8px 5px ;
+  font-size: 15px;
+}
 .profile-main-container {
   min-height: 100vh;
   display: flex;
