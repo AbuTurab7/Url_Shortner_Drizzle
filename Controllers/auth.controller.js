@@ -1,12 +1,19 @@
-
 import { createUser , getUserByEmail , getHashPassword , comparePassword , getToken } from "../services/auth.services.controller.js";
+import { loginValidation, registrationValidation } from "../validation/auth-validation.js";
 
 export const getRegister =  (req , res) => {
   return  res.render("auth/register" , {errors : req.flash("errors")});
 }
 
 export const postRegister = async (req , res) => {
-  const {name , email , password } = req.body;
+  const { data , error } = registrationValidation.safeParse(req.body);
+
+  if(error){
+    const errors = error.issues[0].message;
+    req.flash("errors" , errors);
+    res.redirect("/register");
+  } else {
+    const { name , email , password } = data;
   const [userExist] = await getUserByEmail(email);
   
   if(userExist) {
@@ -17,6 +24,8 @@ export const postRegister = async (req , res) => {
  await createUser({name , email , password : hashedPassword });
   
   res.redirect("/login");
+  }
+
 }
 
 export const getLogin =  (req , res) => {
@@ -24,7 +33,14 @@ export const getLogin =  (req , res) => {
 }
 
 export const postlogin = async (req , res) => {
-  const { email , password } = req.body;
+  const { data , error } = loginValidation.safeParse(req.body);
+  
+  if(error){
+    const errors = error.issues[0].message;
+    req.flash("errors" , errors);
+    return res.redirect("/login")
+  } else {
+    const { email , password } = data;
   const [ user ] = await getUserByEmail(email);  
 
   if(!user){
@@ -47,6 +63,7 @@ export const postlogin = async (req , res) => {
 
   res.cookie("access_token", token);
   res.redirect("/");
+  } 
 }
 
 
