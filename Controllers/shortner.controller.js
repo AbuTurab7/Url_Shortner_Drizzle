@@ -2,7 +2,9 @@ import { saveToFile , getLinks , getShortLinks} from "../services/services.contr
 
 
 export const getShortenURL = async (req, res) => {
-  const Links = await getLinks();
+  if(!req.user) return res.redirect("/register");
+  const Links = await getLinks(req.user.id);
+  
   res.render("index", { Links, host: req.host });
 };
 
@@ -20,7 +22,7 @@ export const shortener = async (req, res) => {
   `);
   }
 
-  await saveToFile({ url, shortCode });
+  await saveToFile({ url, shortCode , userId: req.user.id});
   res.send(`
     <script>
       alert("URL shorten successfully!");
