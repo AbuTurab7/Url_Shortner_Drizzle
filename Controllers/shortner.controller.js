@@ -1,5 +1,5 @@
 
-import { saveToFile , getLinks , getShortLinks , getShortLinkById , getUpdatedShortCode} from "../services/services.controller.js";
+import { saveToFile , getLinks , getShortLinks , getShortLinkById , getUpdatedShortCode , deleteShortLinkById} from "../services/services.controller.js";
 import { shortnerValidation } from "../validation/shortner-validation.js";
 import z from "zod";
 
@@ -99,4 +99,19 @@ export const postShortCodeEdit = async ( req , res ) => {
   }
 }
 
+export async function postShortCodeDelete(req , res) {
+  const { data : id , error : errors } = z.coerce.number().int().safeParse(req.params.id);
+  if(errors){
+    console.log(errors);
+   return res.redirect("/404");
+  }
+  try {
+    await deleteShortLinkById(id);
+    req.flash("success" , "ShortLink deleted successfully!");
+    return res.redirect("/");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal Server Error")
+  }
+}
 

@@ -2,6 +2,7 @@ import { db } from "../config/db-client.js";
 import { eq } from "drizzle-orm";
 import { url_shortner } from "../drizzle/schema.js";
 
+
 export async function getLinks(userId) {
   return  await db.select().from(url_shortner).where(eq(url_shortner.userId , userId));
 }
@@ -19,5 +20,9 @@ export async function getShortLinkById(id){
 }
 
 export async function getUpdatedShortCode({id , url , shortCode}) {
-  return await db.update(url_shortner).set({url , shortCode}).where(eq(url_shortner.id , id))
+  return await db.update(url_shortner).set({url , shortCode}).where(eq(url_shortner.id , id));
+}
+
+export async function deleteShortLinkById(id) {
+  return await db.delete(url_shortner).where(eq(url_shortner.id , id));
 }
