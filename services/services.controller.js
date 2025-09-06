@@ -13,3 +13,11 @@ export async function saveToFile({ url, shortCode , userId }) {
 export async function getShortLinks(shortCode) {
   return await db.select().from(url_shortner).where(eq(url_shortner.shortCode , shortCode));
 }
+
+export async function getShortLinkById(id){
+  return await db.select().from(url_shortner).where(eq(url_shortner.id , id));
+}
+
+export async function getUpdatedShortCode({id , url , shortCode}) {
+  return await db.update(url_shortner).set({url , shortCode}).where(eq(url_shortner.id , id))
+}

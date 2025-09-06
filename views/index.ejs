@@ -16,67 +16,73 @@
     <main class="main-container">
       <div class="container">
         <section class="hero">
-        <h1>🔗 URL Shortener</h1>
-        <% if(success || success.length >= 0) { %>
-          <% success.forEach((success) => { %>
-            <p class="flash-success"><%= success %></p>
-         <% })} %>
-      </section>
+          <h1>🔗 URL Shortener</h1>
+          <% if(success || success.length >= 0) { %> <%
+          success.forEach((success) => { %>
+          <p class="flash-success"><%= success %></p>
+          <% })} %>
+        </section>
 
-      <section class="form-card">
-        <form action="/shorten" method="POST" class="shorten-form">
-          <div class="form-group">
-            <label for="url">Enter URL</label>
-            <input
-              type="url"
-              name="url"
-              id="url"
-              required
-              placeholder="https://www.youtube.com"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="shortCode">Custom Short Code</label>
-            <input
-              type="text"
-              name="shortCode"
-              id="shortCode"
-              required
-              placeholder="youtube123"
-            />
-          </div>
-
-          <button id="shortenBtn" type="submit" class="btn-primary">
-            🚀 Shorten
-          </button>
-        </form>
-        <% if(errors || errors.length >= 0) { %>
-         <% errors.forEach((error) => { %>
-          <p class="flash-error"><%= error %></p>
-        <%  });} %>
-      </section>
-
-      <section class="links-card">
-        <h2>📌 Recent Shortened URLs</h2>
-        <ul id="shortened_urls" class="links-list">
-          <% const list = Links %> <% const newList = list.slice(-5).reverse()
-          %> <% newList.map(({shortCode, url}) => { %> <% const newURL =
-          url.length >= 40 ? url.slice(0, 40) + "..." : url; %>
-          <li class="link-item">
-            <a href="/<%= shortCode %>" target="_blank">
-              <%= host %>/<%= shortCode %>
-            </a>
-            <div class="link-actions">
-              <span class="full-url" title="<%= url %>"><%= newURL %></span>
-              <button class="copy-btn" data-url="<%= host %>/<%= shortCode %>">
-                📋 Copy
-              </button>
+        <section class="form-card">
+          <form action="/shorten" method="POST" class="shorten-form">
+            <div class="form-group">
+              <label for="url">Enter URL</label>
+              <input
+                type="url"
+                name="url"
+                id="url"
+                required
+                placeholder="https://www.youtube.com"
+              />
             </div>
-          </li>
-          <% }) %>
-        </ul>
-      </section>
+
+            <div class="form-group">
+              <label for="shortCode">Custom Short Code</label>
+              <input
+                type="text"
+                name="shortCode"
+                id="shortCode"
+                required
+                placeholder="youtube123"
+              />
+            </div>
+
+            <button id="shortenBtn" type="submit" class="btn-primary">
+              🚀 Shorten
+            </button>
+          </form>
+          <% if(errors || errors.length >= 0) { %> <% errors.forEach((error) =>
+          { %>
+          <p class="flash-error"><%= error %></p>
+          <% });} %>
+        </section>
+
+        <section class="links-card">
+          <h2>📌 Recent Shortened URLs</h2>
+          <ul id="shortened_urls" class="links-list">
+            <% const list = Links %> <% const newList = list.slice(-5).reverse()
+            %> <% newList.map(({shortCode, url , id}) => { %> <% const newURL =
+            url.length >= 40 ? url.slice(0, 40) + "..." : url; %>
+            <li class="link-item">
+              <a href="/<%= shortCode %>" target="_blank">
+                <%= host %>/<%= shortCode %>
+              </a>
+              <div class="link-actions">
+                <span class="full-url" title="<%= url %>"><%= newURL %></span>
+                <button
+                  class="copy-btn"
+                  data-url="<%= host %>/<%= shortCode %>"
+                >
+                  📋 Copy
+                </button>
+                <a href="/edit/<%= id %>">
+                  <button class="copy-btn">✏️ Edit</button>
+                </a>
+              </div>
+            </li>
+            <% }) %>
+          </ul>
+        </section>
       </div>
     </main>
     <script>

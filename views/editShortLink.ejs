@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>URL Shortener</title>
+  </head>
+  <body>
+    <%- include("./partials/navbar"); %>
+
+    <main class="main-container">
+      <div class="container">
+        <section class="hero">
+        <h1>🔗 URL Shortener</h1>
+      </section>
+
+      <section class="form-card">
+        <form action="/edit/<%= id %>" method="POST" class="shorten-form">
+          <div class="form-group">
+            <label for="url">Enter URL</label>
+            <input
+              type="url"
+              name="url"
+              id="url"
+              value="<%= url %>"
+              required
+              placeholder="https://www.youtube.com"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="shortCode">Custom Short Code</label>
+            <input
+              type="text"
+              name="shortCode"
+              id="shortCode"
+              value="<%= shortCode %>"
+              required
+              placeholder="youtube123"
+            />
+          </div>
+
+          <button id="shortenBtn" type="submit" class="btn-primary">
+            🚀 Update
+          </button>
+        </form>
+        <% if(errors || errors.length >= 0) { %>
+         <% errors.forEach((error) => { %>
+          <p class="flash-error"><%= error %></p>
+        <%  });} %>
+      </section>
+
+      </div>
+    </main>
+  </body>
+</html>
