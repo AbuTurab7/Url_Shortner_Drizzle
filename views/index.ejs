@@ -14,9 +14,13 @@
     <%- include("./partials/navbar"); %>
 
     <main class="main-container">
-      <div class="container <%= user ? 'islogged' : 'notlogged' %>">
+      <div class="container">
         <section class="hero">
         <h1>🔗 URL Shortener</h1>
+        <% if(success || success.length >= 0) { %>
+          <% success.forEach((success) => { %>
+            <p class="flash-success"><%= success %></p>
+         <% })} %>
       </section>
 
       <section class="form-card">
@@ -47,6 +51,10 @@
             🚀 Shorten
           </button>
         </form>
+        <% if(errors || errors.length >= 0) { %>
+         <% errors.forEach((error) => { %>
+          <p class="flash-error"><%= error %></p>
+        <%  });} %>
       </section>
 
       <section class="links-card">

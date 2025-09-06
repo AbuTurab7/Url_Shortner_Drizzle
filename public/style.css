@@ -86,24 +86,18 @@ body {
 }
 
 .container {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.375);
   padding: 30px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* justify-content: center; */
   gap: 20px;
   border-radius: 20px;
   background-color: #fff;
   width: 60%;
   transition: transform 0.2s ease;
 }
-.notlogged{
-  border: 2px solid red;
-}
-.islogged{
-  border: 2px solid green;
-}
+
 .container:hover {
   transform: translateY(-2px);
 }
@@ -147,6 +141,7 @@ form {
   border: none;
   cursor: pointer;
   transition: background 0.3s, transform 0.2s;
+  margin-bottom: 5px;
 }
 
 #shortenBtn:hover {
@@ -335,6 +330,14 @@ form {
    background-color: rgba(239, 68, 68, 0.1);
   border-left: 4px solid rgb(187, 78, 78);
   color: rgb(174, 78, 78);
+  padding: 8px 15px 8px 5px ;
+  font-size: 15px;
+}
+.flash-success{
+  width: 100%;
+   background-color: rgba(16, 225, 86, 0.1);
+  border-left: 4px solid rgb(51, 91, 34);
+  color: rgb(56, 215, 50);
   padding: 8px 15px 8px 5px ;
   font-size: 15px;
 }
