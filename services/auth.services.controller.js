@@ -1,35 +1,118 @@
 import { db } from "../config/db-client.js";
-import { eq , and } from "drizzle-orm";
-import { users } from "../drizzle/schema.js";
+import { eq } from "drizzle-orm";
+import { sessionsTable, usersTable } from "../drizzle/schema.js";
 // import bcrypt from "bcrypt";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
-
+import {
+  ACCESS_TOKEN_EXPIRY,
+  MILLISECONDS_PER_SECOND,
+  REFRESH_TOKEN_EXPIRY,
+} from "../config/constant.js";
 
 export const getUserByEmail = async (email) => {
-    return await db.select().from(users).where(eq(users.email , email));
-}
+  return await db.select().from(usersTable).where(eq(usersTable.email, email));
+};
 
-export const createUser = async ({ name , email , password}) => {
-    return await db.insert(users)
-    .values({ name , email , password})
+export const createUser = async ({ name, email, password }) => {
+  return await db
+    .insert(usersTable)
+    .values({ name, email, password })
     .$returningId();
-}
+};
 
 export const getHashPassword = async (password) => {
-    // return await bcrypt.hash(password , 10 );
-    return await argon2.hash(password);
-}
+  // return await bcrypt.hash(password , 10 );
+  return await argon2.hash(password);
+};
 
-export const comparePassword = async (password , hashPassword) => {
-    // return await bcrypt.compare(password , hashPassword);
-    return await argon2.verify( hashPassword , password );
-}
+export const comparePassword = async (password, hashPassword) => {
+  // return await bcrypt.compare(password , hashPassword);
+  return await argon2.verify(hashPassword, password);
+};
 
-export const getToken = ({id , name , email }) => {
-    return jwt.sign({id , name , email} , process.env.JWT_KEY , { expiresIn : "30d"});
-}
+export const getToken = ({ id, name, email }) => {
+  return jwt.sign({ id, name, email }, process.env.JWT_KEY, {
+    expiresIn: "30d",
+  });
+};
 
-export const verifyToken =  (token) => {
-    return jwt.verify(token , process.env.JWT_KEY);
+export const createSession = async (userId, { ip, userAgent }) => {
+  const [session] = await db
+    .insert(sessionsTable)
+    .values({ userId, ip, userAgent })
+    .$returningId();
+
+  return session;
+};
+
+export const createAccessToken = ({ id, name, email, sessionId }) => {
+  return jwt.sign({ id, name, email, sessionId }, process.env.JWT_KEY, {
+    expiresIn: ACCESS_TOKEN_EXPIRY / MILLISECONDS_PER_SECOND,
+  });
+};
+export const createRefreshToken = (sessionId) => {
+  return jwt.sign({ sessionId }, process.env.JWT_KEY, {
+    expiresIn: REFRESH_TOKEN_EXPIRY / MILLISECONDS_PER_SECOND,
+  });
+};
+
+export const verifyToken = (token) => {
+  return jwt.verify(token, process.env.JWT_KEY);
+};
+
+export const findSessionById = async (sessionId) => {
+  const [session] = await db
+    .select()
+    .from(sessionsTable)
+    .where(eq(sessionsTable.id, sessionId));
+
+  return session;
+};
+
+export const findUserById = async (userId) => {
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, userId));
+
+  return user;
+};
+
+export const refreshTokens = async (refreshToken) => {
+  try {
+    const decodedToken = verifyToken(refreshToken);
+    const currentSession = await findSessionById(decodedToken.sessionId);
+
+    if (!currentSession || !currentSession.valid) {
+      throw new Error("Invalid session");
+    }
+    const user = await findUserById(currentSession.userId);
+
+    if (!user) throw new Error("Invalid user");
+
+    const userInfo = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      sessionId: currentSession.id,
+    };
+
+    const newAccessToken = createAccessToken(userInfo);
+
+    const newRefreshToken = createRefreshToken(currentSession.id);
+
+    return {
+      newAccessToken,
+      newRefreshToken,
+      user: userInfo,
+    };
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+
+export const deleteCurrentSession = async (sessionId) => {
+    await db.delete(sessionsTable).where(eq(sessionsTable.id , sessionId));
 }

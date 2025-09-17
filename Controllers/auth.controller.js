@@ -1,4 +1,5 @@
-import { createUser , getUserByEmail , getHashPassword , comparePassword , getToken } from "../services/auth.services.controller.js";
+import { ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_EXPIRY } from "../config/constant.js";
+import { createUser , getUserByEmail , getHashPassword , comparePassword , deleteCurrentSession , createSession , createRefreshToken , createAccessToken } from "../services/auth.services.controller.js";
 import { loginValidation, registrationValidation } from "../validation/auth-validation.js";
 
 export const getRegister =  (req , res) => {
@@ -55,13 +56,33 @@ export const postlogin = async (req , res) => {
     return res.redirect("/login");
   }
 
-  const token = getToken({
-    id : user.id,
-    name : user.name,
-    email : user.email
+
+  const session = await createSession(user.id , {
+    ip: req.clientIp,
+    userAgent: req.headers["user-agent"],
   });
 
-  res.cookie("access_token", token);
+  const accessToken = createAccessToken({
+    id : user.id,
+     name : user.name,
+    email : user.email,
+    sessionId : session.id,
+  });
+
+  const refreshToken = createRefreshToken( session.id );
+
+  const baseConfig = { httpOnly: true , secure: true };
+
+  res.cookie("access_token", accessToken , {
+    ...baseConfig,
+    maxAge: ACCESS_TOKEN_EXPIRY,
+  });
+
+  res.cookie("refresh_token", refreshToken , {
+    ...baseConfig,
+    maxAge: REFRESH_TOKEN_EXPIRY,
+  });
+
   res.redirect("/");
   } 
 }
@@ -72,7 +93,11 @@ export const getProfile = (req , res) => {
   res.render("auth/profile");
 } 
 
-export const getLogout = (req , res) => {
+export const getLogout = async (req , res) => {
+
+  await deleteCurrentSession(req.user.sessionId);
+  
   res.clearCookie("access_token");
+  res.clearCookie("refresh_token");
   res.redirect("/");
 }

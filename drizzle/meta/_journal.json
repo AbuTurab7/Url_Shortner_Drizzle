@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1756568400811,
-      "tag": "0000_black_infant_terrible",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1756568475542,
-      "tag": "0001_gigantic_oracle",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1756569202402,
-      "tag": "0002_little_xorn",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1757000285251,
-      "tag": "0003_worthless_shriek",
+      "when": 1758111054429,
+      "tag": "0000_chubby_mandarin",
       "breakpoints": true
     }
   ]
