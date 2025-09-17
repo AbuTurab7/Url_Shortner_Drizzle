@@ -22,9 +22,35 @@ export const postRegister = async (req , res) => {
     return res.redirect("/register");
   } 
   const hashedPassword = await getHashPassword(password);
- await createUser({name , email , password : hashedPassword });
+ const [user] = await createUser({name , email , password : hashedPassword });
   
-  res.redirect("/login");
+  const session = await createSession(user.id , {
+    ip: req.clientIp,
+    userAgent: req.headers["user-agent"],
+  });
+
+  const accessToken = createAccessToken({
+    id : user.id,
+     name : name,
+    email : email,
+    sessionId : session.id,
+  });
+
+  const refreshToken = createRefreshToken( session.id );
+
+  const baseConfig = { httpOnly: true , secure: true };
+
+  res.cookie("access_token", accessToken , {
+    ...baseConfig,
+    maxAge: ACCESS_TOKEN_EXPIRY,
+  });
+
+  res.cookie("refresh_token", refreshToken , {
+    ...baseConfig,
+    maxAge: REFRESH_TOKEN_EXPIRY,
+  });
+
+  res.redirect("/");
   }
 
 }
