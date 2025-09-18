@@ -18,6 +18,9 @@ export async function getShortLinks(shortCode) {
 export async function getShortLinkById(id){
   return await db.select().from(shortLinksTable).where(eq(shortLinksTable.id , id));
 }
+export async function getShortLinkByUserId(id){
+  return await db.select().from(shortLinksTable).where(eq(shortLinksTable.userId , id));
+}
 
 export async function getUpdatedShortCode({id , url , shortCode}) {
   return await db.update(shortLinksTable).set({url , shortCode}).where(eq(shortLinksTable.id , id));
@@ -26,3 +29,4 @@ export async function getUpdatedShortCode({id , url , shortCode}) {
 export async function deleteShortLinkById(id) {
   return await db.delete(shortLinksTable).where(eq(shortLinksTable.id , id));
 }
+ 

@@ -1,5 +1,6 @@
 import { authenticateUser } from "../middlewares/verify-auth-middleware.js";
-import { createUser , getUserByEmail , getHashPassword , comparePassword , deleteCurrentSession  } from "../services/auth.services.controller.js";
+import { createUser , getUserByEmail , getHashPassword , comparePassword , deleteCurrentSession, findUserById  } from "../services/auth.services.controller.js";
+import { getShortLinkByUserId } from "../services/services.controller.js";
 import { loginValidation, registrationValidation } from "../validation/auth-validation.js";
 
 export const getRegister =  (req , res) => {
@@ -61,9 +62,27 @@ await authenticateUser({ req , res , user });
 }
 
 
-export const getProfile = (req , res) => {
+export const getProfile = async (req , res) => {
+
   if(!req.user) return res.send(`<h1>You are not logged in</h1>`);
-  res.render("auth/profile");
+
+  const user = await findUserById(req.user.id);
+  // console.log("user" , user);
+  
+  if(!user) return res.send(`<h1>You are not logged in</h1>`);
+  
+  const userShortLinks = await getShortLinkByUserId(user.id);
+  // console.log("usershortLinks :", userShortLinks);
+  
+  res.render("auth/profile" , {
+     user : {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt,
+      links: userShortLinks,
+     },
+   });
 } 
 
 export const getLogout = async (req , res) => {
