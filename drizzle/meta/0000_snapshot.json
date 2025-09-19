@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "746b258d-1373-4453-a2e0-b36a9020b4b5",
+  "id": "bf049bf0-faea-488c-9f73-f5c53259da9c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "sessions": {
@@ -255,8 +255,8 @@
       },
       "checkConstraint": {}
     },
-    "is_email_valid": {
-      "name": "is_email_valid",
+    "verify_email_tokens": {
+      "name": "verify_email_tokens",
       "columns": {
         "id": {
           "name": "id",
@@ -298,9 +298,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "is_email_valid_user_id_users_id_fk": {
-          "name": "is_email_valid_user_id_users_id_fk",
-          "tableFrom": "is_email_valid",
+        "verify_email_tokens_user_id_users_id_fk": {
+          "name": "verify_email_tokens_user_id_users_id_fk",
+          "tableFrom": "verify_email_tokens",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -313,8 +313,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "is_email_valid_id": {
-          "name": "is_email_valid_id",
+        "verify_email_tokens_id": {
+          "name": "verify_email_tokens_id",
           "columns": [
             "id"
           ]

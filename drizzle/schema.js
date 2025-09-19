@@ -19,7 +19,7 @@ export const shortLinksTable = mysqlTable("short_link", {
     .references(() => usersTable.id),
 });
 
-export const verifyEmailTokensTable = mysqlTable("is_email_valid" , {
+export const verifyEmailTokensTable = mysqlTable("verify_email_tokens" , {
   id: int("id").autoincrement().primaryKey(),
   userId: int("user_id").notNull().references(() => usersTable.id , { onDelete: "cascade" }),
   token: varchar({length : 8 }).notNull(),

@@ -1,7 +1,9 @@
+import { createVerify } from "crypto";
 import { authenticateUser } from "../middlewares/verify-auth-middleware.js";
-import { createUser , getUserByEmail , getHashPassword , comparePassword , deleteCurrentSession, findUserById  } from "../services/auth.services.controller.js";
+import { createUser , getUserByEmail , getHashPassword , comparePassword , deleteCurrentSession, findUserById , generateRandomToken , createVerifyLink, insertVerifyEmailToken  } from "../services/auth.services.controller.js";
 import { getShortLinkByUserId } from "../services/services.controller.js";
 import { loginValidation, registrationValidation } from "../validation/auth-validation.js";
+import { sendEmail } from "../lib/nodemailer.js";
 
 export const getRegister =  (req , res) => {
   return  res.render("auth/register" , {errors : req.flash("errors")});
@@ -92,3 +94,35 @@ export const getLogout = async (req , res) => {
   res.clearCookie("refresh_token");
   res.redirect("/");
 }
+
+//verify-email
+
+export const getVerifyEmail = async (req , res) => {
+  if(!req.user) return res.redirect("/");
+  const user = await findUserById(req.user.id);
+  if(!user || user.isEmailValid ) return res.redirect("/");
+  return res.render("auth/verifyEmail" , { email: user.email });
+
+}
+
+// resend-verification-link
+
+export const postResendVerificationLink = async (req , res ) => {
+  if(!req.user) return res.redirect("/");
+  const user = await findUserById(req.user.id);
+  if(!user || user.isEmailValid ) return res.redirect("/");
+  const randomToken =  generateRandomToken();
+  await insertVerifyEmailToken({ userId: user.id , token: randomToken });
+  const verifyEmailLink = await createVerifyLink({ email: user.email , token: randomToken });
+
+  await sendEmail({
+    to: user.email,
+    subject: "verify your email",
+    html: `
+    <h1>Click the link below to verify your email</h1>
+    <p>You can use this token: <code>${randomToken}</code></p>
+    <a href="${verifyEmailLink}">Verify Email</a>
+    `,
+  }).catch(console.error);
+  res.redirect("/verify-email");
+}    
