@@ -130,7 +130,7 @@ export const generateRandomToken = (digit = 8) => {
 };
 
 export const insertVerifyEmailToken = async ({ userId, token }) => {
-  return db.transaction( async (tx) => {
+  return db.transaction(async (tx) => {
     try {
       await tx
         .delete(verifyEmailTokensTable)
@@ -151,6 +151,8 @@ export const insertVerifyEmailToken = async ({ userId, token }) => {
 };
 
 export const createVerifyLink = async ({ email, token }) => {
-  const encodedEmail = encodeURIComponent(email);
-  return `${process.env.FRONTENT_URL}/verify-email-token?token=${token}&email=${encodedEmail}`;
+  const url = new URL(`${process.env.FRONTEND_URL}/verify-email-token`);
+  url.searchParams.append("token", token);
+  url.searchParams.append("email", email);
+  return url.toString();
 };
