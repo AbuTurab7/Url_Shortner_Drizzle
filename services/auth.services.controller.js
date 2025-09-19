@@ -1,6 +1,10 @@
 import { db } from "../config/db-client.js";
 import { eq, lt, sql } from "drizzle-orm";
-import { sessionsTable, usersTable, verifyEmailTokensTable } from "../drizzle/schema.js";
+import {
+  sessionsTable,
+  usersTable,
+  verifyEmailTokensTable,
+} from "../drizzle/schema.js";
 // import bcrypt from "bcrypt";
 import crypto from "crypto";
 import argon2 from "argon2";
@@ -115,23 +119,38 @@ export const refreshTokens = async (refreshToken) => {
   }
 };
 
-
 export const deleteCurrentSession = async (sessionId) => {
-    await db.delete(sessionsTable).where(eq(sessionsTable.id , sessionId));
+  await db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
 };
 
-export const generateRandomToken = ( digit = 8 ) => {
-  const min = 10 ** ( digit - 1 );
-  const max = 10 **  digit;
-  return crypto.randomInt( min , max ).toString();
+export const generateRandomToken = (digit = 8) => {
+  const min = 10 ** (digit - 1);
+  const max = 10 ** digit;
+  return crypto.randomInt(min, max).toString();
 };
 
-export const insertVerifyEmailToken = async ({ userId , token }) => {
-  await db.delete(verifyEmailTokensTable).where(lt(verifyEmailTokensTable.expiresAt, sql`CURRENT_TIMESTAMP`));
-  await db.insert(verifyEmailTokensTable).values({ userId, token: token.toString(),  });
+export const insertVerifyEmailToken = async ({ userId, token }) => {
+  return db.transaction( async (tx) => {
+    try {
+      await tx
+        .delete(verifyEmailTokensTable)
+        .where(lt(verifyEmailTokensTable.expiresAt, sql`CURRENT_TIMESTAMP`));
+
+      await tx
+        .delete(verifyEmailTokensTable)
+        .where(eq(verifyEmailTokensTable.userId, userId));
+
+      await tx
+        .insert(verifyEmailTokensTable)
+        .values({ userId, token: token.toString() });
+    } catch (error) {
+      console.error("Failed to insert verification token", error);
+      throw new Error("Unable to create verification token");
+    }
+  });
 };
 
-export const createVerifyLink = async ({ email , token }) => {
+export const createVerifyLink = async ({ email, token }) => {
   const encodedEmail = encodeURIComponent(email);
   return `${process.env.FRONTENT_URL}/verify-email-token?token=${token}&email=${encodedEmail}`;
-}
+};
