@@ -95,6 +95,7 @@ export const refreshTokens = async (refreshToken) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      isEmailValid: user.isEmailValid,
       sessionId: currentSession.id,
     };
 

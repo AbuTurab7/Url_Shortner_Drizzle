@@ -67,18 +67,17 @@ export const getProfile = async (req , res) => {
   if(!req.user) return res.send(`<h1>You are not logged in</h1>`);
 
   const user = await findUserById(req.user.id);
-  // console.log("user" , user);
   
   if(!user) return res.send(`<h1>You are not logged in</h1>`);
   
   const userShortLinks = await getShortLinkByUserId(user.id);
-  // console.log("usershortLinks :", userShortLinks);
   
   res.render("auth/profile" , {
      user : {
       id: user.id,
       name: user.name,
       email: user.email,
+      isEmailValid: user.isEmailValid,
       createdAt: user.createdAt,
       links: userShortLinks,
      },

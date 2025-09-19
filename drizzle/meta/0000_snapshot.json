@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "c247d4b3-c06a-44d1-ab8d-07e06355d928",
+  "id": "746b258d-1373-4453-a2e0-b36a9020b4b5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "sessions": {
@@ -253,6 +253,74 @@
           ]
         }
       },
+      "checkConstraint": {}
+    },
+    "is_email_valid": {
+      "name": "is_email_valid",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "token": {
+          "name": "token",
+          "type": "varchar(8)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "( CURRENT_TIMESTAMP + INTERVAL 1 DAY )"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "is_email_valid_user_id_users_id_fk": {
+          "name": "is_email_valid_user_id_users_id_fk",
+          "tableFrom": "is_email_valid",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "is_email_valid_id": {
+          "name": "is_email_valid_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
       "checkConstraint": {}
     }
   },

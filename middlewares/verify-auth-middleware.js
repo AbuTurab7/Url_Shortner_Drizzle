@@ -54,6 +54,7 @@ export const authenticateUser = async ({ req , res , user , name , email }) => {
     id : user.id,
      name : name,
     email : email,
+    isEmailValid: false,
     sessionId : session.id,
   });
 

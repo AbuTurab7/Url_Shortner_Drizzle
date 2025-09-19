@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   int,
@@ -19,6 +19,14 @@ export const shortLinksTable = mysqlTable("short_link", {
     .references(() => usersTable.id),
 });
 
+export const verifyEmailTokensTable = mysqlTable("is_email_valid" , {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").notNull().references(() => usersTable.id , { onDelete: "cascade" }),
+  token: varchar({length : 8 }).notNull(),
+  expiresAt: timestamp("expires_at").default( sql `( CURRENT_TIMESTAMP + INTERVAL 1 DAY )`).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+
 export const sessionsTable = mysqlTable("sessions", {
   id: int().autoincrement().primaryKey(),
   userId: int("user_id")
@@ -37,8 +45,8 @@ export const usersTable = mysqlTable("users", {
   name: varchar({ length: 255 }).notNull(),
   email: varchar({ length: 255 }).notNull().unique(),
   password: varchar({ length: 255 }),
-  // avatarUrl: text("avatar_url"),
-  // isEmailValid: boolean("is_email_valid").default(false).notNull(),
+  avatarUrl: text("avatar_url"),
+  isEmailValid: boolean("is_email_valid").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
