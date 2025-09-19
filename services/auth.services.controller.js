@@ -1,5 +1,5 @@
 import { db } from "../config/db-client.js";
-import { eq, lt, sql } from "drizzle-orm";
+import { and, eq, gte, lt, sql } from "drizzle-orm";
 import {
   sessionsTable,
   usersTable,
@@ -155,4 +155,55 @@ export const createVerifyLink = async ({ email, token }) => {
   url.searchParams.append("token", token);
   url.searchParams.append("email", email);
   return url.toString();
+};
+
+export const findVerificationEmailToken = async ({ token, email }) => {
+  const tokenData = await db
+    .select({
+      userId: verifyEmailTokensTable.userId,
+      token: verifyEmailTokensTable.token,
+      expiresAt: verifyEmailTokensTable.expiresAt,
+    })
+    .from(verifyEmailTokensTable)
+    .where(
+      and(eq(verifyEmailTokensTable.token, token)),
+      gte(verifyEmailTokensTable.expiresAt, sql`CURRENT_TIMESTAMP`)
+    );
+
+  if (!tokenData.length) {
+    return null;
+  }
+
+  const { userId } = tokenData[0];
+  const userData = await db
+    .select({
+      userId: usersTable.id,
+      email: usersTable.email,
+    })
+    .from(usersTable)
+    .where(eq(usersTable.id, userId));
+
+  if (!userData.length) {
+    return null;
+  }
+
+  return {
+    userId: userData[0].userId,
+    email: userData[0].email,
+    token: tokenData[0].token,
+    expiresAt: tokenData[0].expiresAt,
+  };
+};
+
+export const verifyUserEmailAndUpdateToken = async (email) => {
+  await db
+    .update(usersTable)
+    .set({ isEmailValid: true })
+    .where(eq(usersTable.email, email));
+};
+
+export const clearVerifyEmailToken = async (userId) => {
+  await db
+    .delete(verifyEmailTokensTable)
+    .where(verifyEmailTokensTable.userId, userId);
 };

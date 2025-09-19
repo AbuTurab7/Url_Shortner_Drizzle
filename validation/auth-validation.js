@@ -1,4 +1,4 @@
-import z from "zod";
+import z, { email } from "zod";
 
 export const loginValidation = z.object({
     email: z.email({ message: "Please enter a valid email address." })
@@ -16,4 +16,9 @@ export const registrationValidation = loginValidation.extend({
     .trim()
     .min(3 , { message: "Name must be at least 3 characters long." })
     .max(100, { message: "Name must be no more than 100 characters." }),
+});
+
+export const verifyEmailValidation = z.object({
+    token: z.string().trim().length(8),
+    email: z.email().trim(),
 });

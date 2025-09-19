@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getRegister ,postRegister, getLogin, postlogin , getProfile , getLogout , getVerifyEmail , postResendVerificationLink } from "../Controllers/auth.controller.js";
+import { getRegister ,postRegister, getLogin, postlogin , getProfile , getLogout , getVerifyEmail , postResendVerificationLink , getVerifyEmailToken} from "../Controllers/auth.controller.js";
 
 const authRouter = Router();
 
@@ -13,5 +13,8 @@ authRouter.route("/verify-email").get(getVerifyEmail);
 
 authRouter.route("/resend-verification-link").post(postResendVerificationLink);
 
+authRouter.route("/verify-email-token").get(getVerifyEmailToken);
+
 authRouter.route("/logout").get(getLogout);
+
 export default authRouter;

@@ -1,8 +1,8 @@
-import { createVerify } from "crypto";
+import { createVerify, verify } from "crypto";
 import { authenticateUser } from "../middlewares/verify-auth-middleware.js";
-import { createUser , getUserByEmail , getHashPassword , comparePassword , deleteCurrentSession, findUserById , generateRandomToken , createVerifyLink, insertVerifyEmailToken  } from "../services/auth.services.controller.js";
+import { createUser , getUserByEmail , getHashPassword , comparePassword , deleteCurrentSession, findUserById , generateRandomToken , createVerifyLink, insertVerifyEmailToken, clearVerifyEmailToken, verifyUserEmailAndUpdateToken, findVerificationEmailToken  } from "../services/auth.services.controller.js";
 import { getShortLinkByUserId } from "../services/services.controller.js";
-import { loginValidation, registrationValidation } from "../validation/auth-validation.js";
+import { loginValidation, registrationValidation, verifyEmailValidation } from "../validation/auth-validation.js";
 import { sendEmail } from "../lib/nodemailer.js";
 
 export const getRegister =  (req , res) => {
@@ -126,3 +126,23 @@ export const postResendVerificationLink = async (req , res ) => {
   }).catch(console.error);
   res.redirect("/verify-email");
 }    
+
+
+//verify-email-token
+
+export const getVerifyEmailToken = async ( req , res ) => {
+  const { data , error } = verifyEmailValidation.safeParse(req.query);
+
+  if(error){
+    return res.send("verification link invalid or expired!");
+  }
+
+  const token = await findVerificationEmailToken(data);
+  if(!token) return res.send("verification link invalid or expired!");
+
+  await verifyUserEmailAndUpdateToken(token.email);
+
+  await clearVerifyEmailToken(token.userId).catch(console.log(error));
+
+  return res.redirect("/profile");
+}
