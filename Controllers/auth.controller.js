@@ -3,6 +3,10 @@ import { createUser , getUserByEmail , getHashPassword , comparePassword , delet
 import { getShortLinkByUserId } from "../services/services.controller.js";
 import { loginValidation, registrationValidation, verifyEmailValidation } from "../validation/auth-validation.js";
 import { sendEmail } from "../lib/nodemailer.js";
+import fs from "fs/promises";
+import { join } from "path";
+import ejs from "ejs";
+import mjml2html from "mjml";
 
 export const getRegister =  (req , res) => {
   return  res.render("auth/register" , {errors : req.flash("errors")});
@@ -114,15 +118,17 @@ export const postResendVerificationLink = async (req , res ) => {
   const randomToken =  generateRandomToken();
   await insertVerifyEmailToken({ userId: user.id , token: randomToken });
   const verifyEmailLink = await createVerifyLink({ email: user.email , token: randomToken });
+  
+  const mjmlTemplate = await fs.readFile(join(import.meta.dirname , ".." , "emails" , "verify-email.mjml") , "utf-8");
+  const filledTemplate = ejs.render(mjmlTemplate , { code: randomToken , link: verifyEmailLink });
+
+  const htmlOutput = mjml2html(filledTemplate).html;
+
 
   await sendEmail({
     to: user.email,
     subject: "verify your email",
-    html: `
-    <h1>Click the link below to verify your email</h1>
-    <p>You can use this token: <code>${randomToken}</code></p>
-    <a href="${verifyEmailLink}">Verify Email</a>
-    `,
+    html: htmlOutput,
   }).catch(console.error);
   res.redirect("/verify-email");
 }    
@@ -146,3 +152,5 @@ export const getVerifyEmailToken = async ( req , res ) => {
 
   return res.redirect("/profile");
 }
+
+

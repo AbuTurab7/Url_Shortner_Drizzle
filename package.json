@@ -10,6 +10,7 @@
     "express": "^5.0.0",
     "express-session": "^1.18.2",
     "jsonwebtoken": "^9.0.2",
+    "mjml": "^4.16.1",
     "mongodb": "^6.18.0",
     "mongoose": "^8.18.0",
     "mysql2": "^3.14.3",
