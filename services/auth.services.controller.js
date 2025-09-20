@@ -158,7 +158,7 @@ export const createVerifyLink = async ({ email, token }) => {
 };
 
 export const findVerificationEmailToken = async ({ token , email }) => {
-  return await db
+  return  db
   .select({
       userId: usersTable.id,
       email: usersTable.email,
@@ -182,7 +182,7 @@ export const verifyUserEmailAndUpdateToken = async (email) => {
 };
 
 export const clearVerifyEmailToken = async (userId) => {
-  await db
+  return db
     .delete(verifyEmailTokensTable)
     .where(verifyEmailTokensTable.userId, userId);
 };

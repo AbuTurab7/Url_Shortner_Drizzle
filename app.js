@@ -8,6 +8,7 @@ import { verifyAuthentication } from "./middlewares/verify-auth-middleware.js";
 import flash from "connect-flash";
 import session from "express-session";
 import requestIp from "request-ip"
+
 const app = express();
 app.set("view engine" , "ejs");
 const staticPath = join(import.meta.dirname, "public");

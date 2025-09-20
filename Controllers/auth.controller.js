@@ -2,7 +2,8 @@ import { authenticateUser } from "../middlewares/verify-auth-middleware.js";
 import { createUser , getUserByEmail , getHashPassword , comparePassword , deleteCurrentSession, findUserById , generateRandomToken , createVerifyLink, insertVerifyEmailToken, clearVerifyEmailToken, verifyUserEmailAndUpdateToken, findVerificationEmailToken  } from "../services/auth.services.controller.js";
 import { getShortLinkByUserId } from "../services/services.controller.js";
 import { loginValidation, registrationValidation, verifyEmailValidation } from "../validation/auth-validation.js";
-import { sendEmail } from "../lib/nodemailer.js";
+// import { sendEmail } from "../lib/nodemailer.js";
+import { sendEmail } from "../lib/resendEmail.js";
 import fs from "fs/promises";
 import { join } from "path";
 import ejs from "ejs";
@@ -125,7 +126,7 @@ export const postResendVerificationLink = async (req , res ) => {
   const htmlOutput = mjml2html(filledTemplate).html;
 
 
-  await sendEmail({
+  sendEmail({
     to: user.email,
     subject: "verify your email",
     html: htmlOutput,
@@ -148,8 +149,8 @@ export const getVerifyEmailToken = async ( req , res ) => {
 
   await verifyUserEmailAndUpdateToken(token.email);
 
-  await clearVerifyEmailToken(token.userId).catch(console.log(error));
-
+  await clearVerifyEmailToken(token.userId)
+  
   return res.redirect("/profile");
 }
 
