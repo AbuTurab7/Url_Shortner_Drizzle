@@ -1,13 +1,14 @@
 import { authenticateUser } from "../middlewares/verify-auth-middleware.js";
-import { createUser , getUserByEmail , getHashPassword , comparePassword , deleteCurrentSession, findUserById , generateRandomToken , createVerifyLink, insertVerifyEmailToken, clearVerifyEmailToken, verifyUserEmailAndUpdateToken, findVerificationEmailToken  } from "../services/auth.services.controller.js";
+import { createUser , getUserByEmail , getHashPassword , comparePassword , deleteCurrentSession, findUserById , generateRandomToken , createVerifyLink, insertVerifyEmailToken, clearVerifyEmailToken, verifyUserEmailAndUpdateToken, findVerificationEmailToken, updateProfile  } from "../services/auth.services.controller.js";
 import { getShortLinkByUserId } from "../services/services.controller.js";
-import { loginValidation, registrationValidation, verifyEmailValidation } from "../validation/auth-validation.js";
+import { loginValidation, registrationValidation, verifyEmailValidation, verifyUserValidation } from "../validation/auth-validation.js";
 // import { sendEmail } from "../lib/nodemailer.js";
 import { sendEmail } from "../lib/resendEmail.js";
 import fs from "fs/promises";
 import { join } from "path";
 import ejs from "ejs";
 import mjml2html from "mjml";
+import { error } from "console";
 
 export const getRegister =  (req , res) => {
   return  res.render("auth/register" , {errors : req.flash("errors")});
@@ -155,3 +156,29 @@ export const getVerifyEmailToken = async ( req , res ) => {
 }
 
 
+//edit profile page
+//get
+export const getEditProfile = async ( req , res ) => {
+  if(!req.user) return res.send(`<h1>You are not logged in</h1>`);
+
+  return res.render("auth/editProfile" , {
+    user: req.user,
+    errors: req.flash("errors"),
+  });
+}
+//post
+export const postEditProfile = async ( req , res ) => {
+  if(!req.user) return res.send(`<h1>You are not logged in</h1>`);
+
+  const { data , error } = verifyUserValidation.safeParse(req.body);
+  if(error){
+    console.log("Name Error : " , error);
+    const errorMessage = error.issues[0].message;
+    req.flash("errors" , errorMessage);
+   return res.redirect("/edit-profile");
+  }
+  
+  await updateProfile({ userId: req.user.id , name: data.name });
+
+  return res.redirect("/profile");
+}

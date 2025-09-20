@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/material-design-iconic-font@2.2.0/dist/css/material-design-iconic-font.min.css"
+    />
+    <title>Edit Profile</title>
+  </head>
+
+  <body>
+    <%- include('../partials/navbar.ejs') %>
+
+    <div class="main-container">
+      <div class="container">
+        <div class="user-status">
+          <% if(user) { %>
+          <div class="status-badge success">
+            <i class="zmdi zmdi-check-circle"></i>
+            <span>You are logged in</span>
+          </div>
+          <% } else { %>
+          <div class="status-badge warning">
+            <i class="zmdi zmdi-alert-circle"></i>
+            <span>You are not logged in</span>
+          </div>
+          <% } %>
+        </div>
+
+        <div class="shortener-form">
+          <h1 class="form-title">Edit Your Profile</h1>
+        </div>
+        <form
+          action="/edit-profile"
+          method="post"
+          class="shorten-form"
+          id="url-form"
+        >
+          <div class="edit-profile-form">
+            <label for="name">
+              <i class="zmdi zmdi-account"></i>
+            </label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              value="<%= user.name  %>"
+              required
+            />
+          </div>
+
+          <% if ((errors && errors.length > 0)) { %> <% errors.forEach((error) => { %>
+          <p class="flash-error"><%= error %></p>
+          <% }); %> <% } %>
+
+          <button id="shortenBtn" type="submit" class="btn-primary">
+             Save changes
+          </button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
