@@ -14,7 +14,7 @@ import {
   MILLISECONDS_PER_SECOND,
   REFRESH_TOKEN_EXPIRY,
 } from "../config/constant.js";
-import { email } from "zod";
+
 
 export const getUserByEmail = async (email) => {
   return await db.select().from(usersTable).where(eq(usersTable.email, email));
@@ -157,42 +157,21 @@ export const createVerifyLink = async ({ email, token }) => {
   return url.toString();
 };
 
-export const findVerificationEmailToken = async ({ token, email }) => {
-  const tokenData = await db
-    .select({
-      userId: verifyEmailTokensTable.userId,
+export const findVerificationEmailToken = async ({ token , email }) => {
+  return await db
+  .select({
+      userId: usersTable.id,
+      email: usersTable.email,
       token: verifyEmailTokensTable.token,
       expiresAt: verifyEmailTokensTable.expiresAt,
     })
     .from(verifyEmailTokensTable)
     .where(
-      and(eq(verifyEmailTokensTable.token, token)),
+      and(
+        eq(verifyEmailTokensTable.token, token)),
+        eq(usersTable.email, email),
       gte(verifyEmailTokensTable.expiresAt, sql`CURRENT_TIMESTAMP`)
-    );
-
-  if (!tokenData.length) {
-    return null;
-  }
-
-  const { userId } = tokenData[0];
-  const userData = await db
-    .select({
-      userId: usersTable.id,
-      email: usersTable.email,
-    })
-    .from(usersTable)
-    .where(eq(usersTable.id, userId));
-
-  if (!userData.length) {
-    return null;
-  }
-
-  return {
-    userId: userData[0].userId,
-    email: userData[0].email,
-    token: tokenData[0].token,
-    expiresAt: tokenData[0].expiresAt,
-  };
+    ).innerJoin(usersTable , eq(usersTable.id , verifyEmailTokensTable.userId));
 };
 
 export const verifyUserEmailAndUpdateToken = async (email) => {

@@ -1,4 +1,3 @@
-import { createVerify, verify } from "crypto";
 import { authenticateUser } from "../middlewares/verify-auth-middleware.js";
 import { createUser , getUserByEmail , getHashPassword , comparePassword , deleteCurrentSession, findUserById , generateRandomToken , createVerifyLink, insertVerifyEmailToken, clearVerifyEmailToken, verifyUserEmailAndUpdateToken, findVerificationEmailToken  } from "../services/auth.services.controller.js";
 import { getShortLinkByUserId } from "../services/services.controller.js";
@@ -137,7 +136,7 @@ export const getVerifyEmailToken = async ( req , res ) => {
     return res.send("verification link invalid or expired!");
   }
 
-  const token = await findVerificationEmailToken(data);
+  const [token] = await findVerificationEmailToken(data);
   if(!token) return res.send("verification link invalid or expired!");
 
   await verifyUserEmailAndUpdateToken(token.email);
