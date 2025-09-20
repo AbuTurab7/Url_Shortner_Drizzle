@@ -72,5 +72,4 @@ export const authenticateUser = async ({ req , res , user , name , email }) => {
     maxAge: REFRESH_TOKEN_EXPIRY,
   });
 
-  res.redirect("/");
 }

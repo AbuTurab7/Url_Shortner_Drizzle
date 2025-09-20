@@ -28,7 +28,7 @@ export const postRegister = async (req , res) => {
   
  await authenticateUser({ req , res , user , name , email });
   }
-
+res.redirect("/verify-email");
 }
 
 export const getLogin =  (req , res) => {
@@ -60,6 +60,7 @@ export const postlogin = async (req , res) => {
 
 await authenticateUser({ req , res , user });
   } 
+  res.redirect("/");
 }
 
 
