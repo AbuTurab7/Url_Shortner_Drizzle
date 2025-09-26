@@ -14,12 +14,18 @@ import {
   findVerificationEmailToken,
   updateProfile,
   updateUserPassword,
+  findUserByEmail,
+  getForgetPasswordLink,
+  getResetPasswordData,
+  deleteUserTokenData,
 } from "../services/auth.services.controller.js";
 import { getShortLinkByUserId } from "../services/services.controller.js";
 import {
+  forgetPasswordVerification,
   loginValidation,
   passwordVerification,
   registrationValidation,
+  resetPasswordVerification,
   verifyEmailValidation,
   verifyUserValidation,
 } from "../validation/auth-validation.js";
@@ -27,9 +33,10 @@ import {
 import { sendEmail } from "../lib/resendEmail.js";
 import fs from "fs/promises";
 import { join } from "path";
-import ejs from "ejs";
+import ejs, { name } from "ejs";
 import mjml2html from "mjml";
 import { success } from "zod";
+import { asc } from "drizzle-orm";
 
 //registration page
 //get
@@ -63,10 +70,13 @@ export const postRegister = async (req, res) => {
 //Login Page
 //get
 export const getLogin = (req, res) => {
-  return res.render("auth/login", { errors: req.flash("errors") });
+  return res.render("auth/login", {
+    errors: req.flash("errors"),
+    success: req.flash("success"),
+  });
 };
 
-//post 
+//post
 export const postlogin = async (req, res) => {
   const { data, error } = loginValidation.safeParse(req.body);
 
@@ -95,8 +105,7 @@ export const postlogin = async (req, res) => {
   res.redirect("/");
 };
 
-
-// Profile Page 
+// Profile Page
 // get
 export const getProfile = async (req, res) => {
   if (!req.user) return res.send(`<h1>You are not logged in</h1>`);
@@ -130,7 +139,6 @@ export const getLogout = async (req, res) => {
   res.redirect("/");
 };
 
-
 //verify-email
 export const getVerifyEmail = async (req, res) => {
   if (!req.user) return res.redirect("/");
@@ -138,7 +146,6 @@ export const getVerifyEmail = async (req, res) => {
   if (!user || user.isEmailValid) return res.redirect("/");
   return res.render("auth/verifyEmail", { email: user.email });
 };
-
 
 // resend-verification-link
 export const postResendVerificationLink = async (req, res) => {
@@ -170,7 +177,6 @@ export const postResendVerificationLink = async (req, res) => {
   }).catch(console.error);
   res.redirect("/verify-email");
 };
-
 
 //verify-email-token
 export const getVerifyEmailToken = async (req, res) => {
@@ -227,8 +233,8 @@ export const getChangePassword = async (req, res) => {
 };
 
 //post
-export const postChangePassword = async (req , res) => {
-  const { data , error } = passwordVerification.safeParse(req.body);
+export const postChangePassword = async (req, res) => {
+  const { data, error } = passwordVerification.safeParse(req.body);
   const user = await findUserById(req.user.id);
 
   if (error) {
@@ -237,15 +243,104 @@ export const postChangePassword = async (req , res) => {
     return res.redirect("/change-password");
   }
 
-  const isPasswordValid = await comparePassword(data.currentPassword , user.password);
-  if(!isPasswordValid){
+  const isPasswordValid = await comparePassword(
+    data.currentPassword,
+    user.password
+  );
+  if (!isPasswordValid) {
     req.flash("errors", "Current password does not match!");
     return res.redirect("/change-password");
   }
 
   const hashedPassword = await getHashPassword(data.confirmPassword);
-  await updateUserPassword( user.id , hashedPassword );
+  await updateUserPassword(user.id, hashedPassword);
 
   req.flash("success", "Password change successfully!");
   return res.redirect("/profile");
-}
+};
+
+//Forget Password page
+//get
+export const getForgetPassword = async (req, res) => {
+  return res.render("auth/forgetPassword", {
+    formSubmitted: req.flash("formSubmitted")[0],
+    errors: req.flash("errors"),
+  });
+};
+//post
+export const postForgetPassword = async (req, res) => {
+  const { data, error } = forgetPasswordVerification.safeParse(req.body);
+
+  if (error) {
+    const errorMessage = error.issues[0].message;
+    req.flash("errors", errorMessage);
+    return res.redirect("/forget-password");
+  }
+
+  const user = await findUserByEmail(data.email);
+  if (!user) {
+    req.flash("errors", "Cannot find user with this email!");
+    return res.redirect("/forget-password");
+  }
+
+  if (user) {
+    const forgetPasswordLink = await getForgetPasswordLink({ userId: user.id });
+
+    const mjmlTemplate = await fs.readFile(
+      join(import.meta.dirname, "..", "emails", "forget-password-email.mjml"),
+      "utf-8"
+    );
+    const filledTemplate = ejs.render(mjmlTemplate, {
+      name: user.name,
+      link: forgetPasswordLink,
+    });
+
+    const htmlOutput = mjml2html(filledTemplate).html;
+
+    sendEmail({
+      to: user.email,
+      subject: "Reset your password",
+      html: htmlOutput,
+    }).catch(console.error);
+
+    req.flash("formSubmitted", true);
+    return res.redirect("/forget-password");
+  }
+};
+
+// Reset password page
+// get
+export const getResetPassword = async (req, res) => {
+  const { token } = req.params;
+  const resetPasswordData = await getResetPasswordData(token);
+
+  if (!resetPasswordData) return res.render("auth/wrongResetPassword");
+
+  return res.render("auth/resetPassword", {
+    errors: req.flash("errors"),
+    token,
+  });
+};
+// post
+export const postResetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { data, error } = resetPasswordVerification.safeParse(req.body);
+
+  if (error) {
+    const errorMessage = error.issues[0].message;
+    req.flash("errors", errorMessage);
+    return res.redirect(`/reset-password/:${token}`);
+  }
+
+  const resetPasswordData = await getResetPasswordData(token);
+
+  if (!resetPasswordData) return res.render("auth/wrongResetPassword");
+
+  await deleteUserTokenData(resetPasswordData.userId);
+
+  const hashedPassword = await getHashPassword(data.confirmPassword);
+  await updateUserPassword(resetPasswordData.userId, hashedPassword);
+
+  req.flash("success", "Password changed successfully!");
+  return res.redirect("/login");
+};

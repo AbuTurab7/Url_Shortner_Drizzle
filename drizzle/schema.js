@@ -8,6 +8,7 @@ import {
   text,
 } from "drizzle-orm/mysql-core";
 
+//shortLinksTable
 export const shortLinksTable = mysqlTable("short_link", {
   id: int().autoincrement().primaryKey(),
   url: varchar({ length: 255 }).notNull(),
@@ -19,6 +20,7 @@ export const shortLinksTable = mysqlTable("short_link", {
     .references(() => usersTable.id),
 });
 
+//verifyEmailTokenTable
 export const verifyEmailTokensTable = mysqlTable("verify_email_tokens" , {
   id: int("id").autoincrement().primaryKey(),
   userId: int("user_id").notNull().references(() => usersTable.id , { onDelete: "cascade" }),
@@ -27,6 +29,8 @@ export const verifyEmailTokensTable = mysqlTable("verify_email_tokens" , {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
+
+//sessionTable
 export const sessionsTable = mysqlTable("sessions", {
   id: int().autoincrement().primaryKey(),
   userId: int("user_id")
@@ -39,7 +43,7 @@ export const sessionsTable = mysqlTable("sessions", {
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
-
+//usersTable
 export const usersTable = mysqlTable("users", {
   id: int().autoincrement().primaryKey(),
   name: varchar({ length: 255 }).notNull(),
@@ -50,6 +54,21 @@ export const usersTable = mysqlTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
+
+//passwordResetTokensTable
+export const passwordResetTokensTable = mysqlTable("password_reset_tokens", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" })
+    .unique(),
+  tokenHash: text("token_hash").notNull(),
+  expiresAt: timestamp("expires_at")
+    .default(sql`(CURRENT_TIMESTAMP + INTERVAL 1 HOUR)`)
+    .notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 
 // A user can have many short links
 export const usersRelation = relations(usersTable, ({ many }) => ({

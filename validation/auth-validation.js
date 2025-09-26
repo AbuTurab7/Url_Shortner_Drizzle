@@ -6,11 +6,13 @@ const nameSchema = z
   .min(3, { message: "Name must be at least 3 characters long." })
   .max(100, { message: "Name must be no more than 100 characters." });
 
+const emailSchema = z
+  .email({ message: "Please enter a valid email address." })
+  .trim()
+  .max(100, { message: "Email must be no more than 100 characters." });
+
 export const loginValidation = z.object({
-  email: z
-    .email({ message: "Please enter a valid email address." })
-    .trim()
-    .max(100, { message: "Email must be no more than 100 characters." }),
+  email: emailSchema,
 
   password: z
     .string()
@@ -32,8 +34,27 @@ export const verifyUserValidation = z.object({
   name: nameSchema,
 });
 
-export const passwordVerification = z
-  .object({
+export const resetPasswordVerification = z.object({
+  
+    newPassword: z
+      .string()
+      .trim()
+      .min(6, { message: "Password must be at least 6 characters long." })
+      .max(20, { message: "Password must be no more than 20 characters." }),
+
+    confirmPassword: z
+      .string()
+      .trim()
+      .min(6, { message: "Password must be at least 6 characters long." })
+      .max(20, { message: "Password must be no more than 20 characters." }),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Password does not match",
+  });
+
+
+export const passwordVerification = z.object({
+
     currentPassword: z.string().trim(),
 
     newPassword: z
@@ -51,3 +72,9 @@ export const passwordVerification = z
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Password does not match",
   });
+
+
+  export const forgetPasswordVerification = z.object({
+    email: emailSchema,
+  })
+

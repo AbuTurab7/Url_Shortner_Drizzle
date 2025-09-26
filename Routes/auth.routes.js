@@ -13,6 +13,10 @@ import {
   postEditProfile,
   getChangePassword,
   postChangePassword,
+  getForgetPassword,
+  postForgetPassword,
+  getResetPassword,
+  postResetPassword,
 } from "../Controllers/auth.controller.js";
 
 const authRouter = Router();
@@ -34,5 +38,9 @@ authRouter.route("/edit-profile").get(getEditProfile).post(postEditProfile);
 authRouter.route("/change-password").get(getChangePassword).post(postChangePassword);
 
 authRouter.route("/logout").get(getLogout);
+
+authRouter.route("/forget-password").get(getForgetPassword).post(postForgetPassword);
+
+authRouter.route("/reset-password/:token").get(getResetPassword).post(postResetPassword);
 
 export default authRouter;

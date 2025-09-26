@@ -13,6 +13,11 @@
     <div class="auth-container">
       <h2 class="auth-title">Welcome Back 👋</h2>
       <p class="auth-subtitle">Login to continue to <strong>URLShort</strong></p>
+
+      <% if(success || success.length >= 0) { %> <%
+          success.forEach((success) => { %>
+          <p class="flash-success"><%= success %></p>
+          <% })} %>
       
       <form action="/login" method="POST" class="auth-form">
         <div class="auth-input-box">
@@ -28,7 +33,7 @@
         <button type="submit" class="auth-btn">Login</button>
         
         <div class="auth-links">
-          <a href="#" class="link">Forgot Password?</a>
+          <a href="/forget-password" class="link">Forgot Password?</a>
           <span>|</span>
           <a href="/register" class="link">Sign Up</a>
         </div>

@@ -1,6 +1,7 @@
 import { db } from "../config/db-client.js";
 import { and, eq, gte, lt, sql } from "drizzle-orm";
 import {
+  passwordResetTokensTable,
   sessionsTable,
   usersTable,
   verifyEmailTokensTable,
@@ -14,6 +15,7 @@ import {
   MILLISECONDS_PER_SECOND,
   REFRESH_TOKEN_EXPIRY,
 } from "../config/constant.js";
+import { passwordVerification } from "../validation/auth-validation.js";
 
 export const getUserByEmail = async (email) => {
   return await db.select().from(usersTable).where(eq(usersTable.email, email));
@@ -36,7 +38,7 @@ export const comparePassword = async (password, hashPassword) => {
   return await argon2.verify(hashPassword, password);
 };
 
-export const updateUserPassword = async (userId , password) => {
+export const updateUserPassword = async (userId, password) => {
   return await db
     .update(usersTable)
     .set({ password })
@@ -195,4 +197,50 @@ export const clearVerifyEmailToken = async (userId) => {
 
 export const updateProfile = async ({ userId, name }) => {
   return db.update(usersTable).set({ name }).where(eq(usersTable.id, userId));
+};
+
+export const findUserByEmail = async (email) => {
+  const [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.email, email));
+  return user;
+};
+
+export const getForgetPasswordLink = async ({ userId }) => {
+  const randomToken = crypto.randomBytes(32).toString("hex");
+  const tokenHash = crypto
+    .createHash("sha256")
+    .update(randomToken)
+    .digest("hex");
+
+  await db
+    .delete(passwordResetTokensTable)
+    .where(eq(passwordResetTokensTable.userId, userId));
+
+  await db.insert(passwordResetTokensTable).values({ userId, tokenHash });
+
+  return `${process.env.FRONTEND_URL}/reset-password/${randomToken}`;
+};
+
+export const getResetPasswordData = async (token) => {
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+
+  const [data] = await db
+    .select()
+    .from(passwordResetTokensTable)
+    .where(
+      and(
+        eq(passwordResetTokensTable.tokenHash, tokenHash),
+        gte(passwordResetTokensTable.expiresAt, sql`CURRENT_TIMESTAMP`)
+      )
+    );
+
+  return data;
+};
+
+export const deleteUserTokenData = async (userId) => {
+  await db
+    .delete(passwordResetTokensTable)
+    .where(eq(passwordResetTokensTable.userId, userId));
 };
