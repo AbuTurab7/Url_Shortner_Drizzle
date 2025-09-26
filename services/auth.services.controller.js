@@ -15,7 +15,6 @@ import {
   REFRESH_TOKEN_EXPIRY,
 } from "../config/constant.js";
 
-
 export const getUserByEmail = async (email) => {
   return await db.select().from(usersTable).where(eq(usersTable.email, email));
 };
@@ -35,6 +34,13 @@ export const getHashPassword = async (password) => {
 export const comparePassword = async (password, hashPassword) => {
   // return await bcrypt.compare(password , hashPassword);
   return await argon2.verify(hashPassword, password);
+};
+
+export const updateUserPassword = async (userId , password) => {
+  return await db
+    .update(usersTable)
+    .set({ password })
+    .where(eq(usersTable.id, userId));
 };
 
 export const getToken = ({ id, name, email }) => {
@@ -157,9 +163,9 @@ export const createVerifyLink = async ({ email, token }) => {
   return url.toString();
 };
 
-export const findVerificationEmailToken = async ({ token , email }) => {
-  return  db
-  .select({
+export const findVerificationEmailToken = async ({ token, email }) => {
+  return db
+    .select({
       userId: usersTable.id,
       email: usersTable.email,
       token: verifyEmailTokensTable.token,
@@ -167,11 +173,11 @@ export const findVerificationEmailToken = async ({ token , email }) => {
     })
     .from(verifyEmailTokensTable)
     .where(
-      and(
-        eq(verifyEmailTokensTable.token, token)),
-        eq(usersTable.email, email),
+      and(eq(verifyEmailTokensTable.token, token)),
+      eq(usersTable.email, email),
       gte(verifyEmailTokensTable.expiresAt, sql`CURRENT_TIMESTAMP`)
-    ).innerJoin(usersTable , eq(usersTable.id , verifyEmailTokensTable.userId));
+    )
+    .innerJoin(usersTable, eq(usersTable.id, verifyEmailTokensTable.userId));
 };
 
 export const verifyUserEmailAndUpdateToken = async (email) => {
@@ -187,9 +193,6 @@ export const clearVerifyEmailToken = async (userId) => {
     .where(verifyEmailTokensTable.userId, userId);
 };
 
-export const updateProfile = async ({ userId , name }) => {
-  return db
-  .update(usersTable)
-  .set({ name })
-  .where(eq(usersTable.id , userId));
-}
+export const updateProfile = async ({ userId, name }) => {
+  return db.update(usersTable).set({ name }).where(eq(usersTable.id, userId));
+};

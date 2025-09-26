@@ -15,7 +15,6 @@
      <%- include('../partials/navbar') %> 
     <div class="profile-main-container">
       <main class="container">
-        <h1 class="page-title">Your Profile</h1>
         <div class="user-status">
            <% if(user) { %> 
           <div class="status-badge success">
@@ -28,6 +27,10 @@
             <span>You are not logged in</span> 
           </div>
           <% } %> 
+          <% if(success || success.length >= 0) { %> <%
+          success.forEach((success) => { %>
+          <p class="flash-success"><%= success %></p>
+          <% })} %>
         </div>
         <div class="profile-card">
           <div class="profile-header">

@@ -13,10 +13,12 @@ import {
   verifyUserEmailAndUpdateToken,
   findVerificationEmailToken,
   updateProfile,
+  updateUserPassword,
 } from "../services/auth.services.controller.js";
 import { getShortLinkByUserId } from "../services/services.controller.js";
 import {
   loginValidation,
+  passwordVerification,
   registrationValidation,
   verifyEmailValidation,
   verifyUserValidation,
@@ -27,12 +29,14 @@ import fs from "fs/promises";
 import { join } from "path";
 import ejs from "ejs";
 import mjml2html from "mjml";
-import { error } from "console";
+import { success } from "zod";
 
+//registration page
+//get
 export const getRegister = (req, res) => {
   return res.render("auth/register", { errors: req.flash("errors") });
 };
-
+//post
 export const postRegister = async (req, res) => {
   const { data, error } = registrationValidation.safeParse(req.body);
 
@@ -56,10 +60,13 @@ export const postRegister = async (req, res) => {
   res.redirect("/verify-email");
 };
 
+//Login Page
+//get
 export const getLogin = (req, res) => {
   return res.render("auth/login", { errors: req.flash("errors") });
 };
 
+//post 
 export const postlogin = async (req, res) => {
   const { data, error } = loginValidation.safeParse(req.body);
 
@@ -88,6 +95,9 @@ export const postlogin = async (req, res) => {
   res.redirect("/");
 };
 
+
+// Profile Page 
+// get
 export const getProfile = async (req, res) => {
   if (!req.user) return res.send(`<h1>You are not logged in</h1>`);
 
@@ -106,9 +116,12 @@ export const getProfile = async (req, res) => {
       createdAt: user.createdAt,
       links: userShortLinks,
     },
+    success: req.flash("success"),
   });
 };
 
+//Logout Page
+// get
 export const getLogout = async (req, res) => {
   await deleteCurrentSession(req.user.sessionId);
 
@@ -117,8 +130,8 @@ export const getLogout = async (req, res) => {
   res.redirect("/");
 };
 
-//verify-email
 
+//verify-email
 export const getVerifyEmail = async (req, res) => {
   if (!req.user) return res.redirect("/");
   const user = await findUserById(req.user.id);
@@ -126,8 +139,8 @@ export const getVerifyEmail = async (req, res) => {
   return res.render("auth/verifyEmail", { email: user.email });
 };
 
-// resend-verification-link
 
+// resend-verification-link
 export const postResendVerificationLink = async (req, res) => {
   if (!req.user) return res.redirect("/");
   const user = await findUserById(req.user.id);
@@ -158,8 +171,8 @@ export const postResendVerificationLink = async (req, res) => {
   res.redirect("/verify-email");
 };
 
-//verify-email-token
 
+//verify-email-token
 export const getVerifyEmailToken = async (req, res) => {
   const { data, error } = verifyEmailValidation.safeParse(req.query);
 
@@ -212,3 +225,27 @@ export const getChangePassword = async (req, res) => {
     errors: req.flash("errors"),
   });
 };
+
+//post
+export const postChangePassword = async (req , res) => {
+  const { data , error } = passwordVerification.safeParse(req.body);
+  const user = await findUserById(req.user.id);
+
+  if (error) {
+    const errorMessage = error.issues[0].message;
+    req.flash("errors", errorMessage);
+    return res.redirect("/change-password");
+  }
+
+  const isPasswordValid = await comparePassword(data.currentPassword , user.password);
+  if(!isPasswordValid){
+    req.flash("errors", "Current password does not match!");
+    return res.redirect("/change-password");
+  }
+
+  const hashedPassword = await getHashPassword(data.confirmPassword);
+  await updateUserPassword( user.id , hashedPassword );
+
+  req.flash("success", "Password change successfully!");
+  return res.redirect("/profile");
+}

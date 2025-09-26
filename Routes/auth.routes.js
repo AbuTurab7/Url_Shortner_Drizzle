@@ -12,6 +12,7 @@ import {
   getEditProfile,
   postEditProfile,
   getChangePassword,
+  postChangePassword,
 } from "../Controllers/auth.controller.js";
 
 const authRouter = Router();
@@ -30,7 +31,7 @@ authRouter.route("/verify-email-token").get(getVerifyEmailToken);
 
 authRouter.route("/edit-profile").get(getEditProfile).post(postEditProfile);
 
-authRouter.route("/change-password").get(getChangePassword);
+authRouter.route("/change-password").get(getChangePassword).post(postChangePassword);
 
 authRouter.route("/logout").get(getLogout);
 
