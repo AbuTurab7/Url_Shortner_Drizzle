@@ -9,9 +9,9 @@
       rel="stylesheet"
     />
     <link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-/>
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
 
     <title>URL Shortener</title>
   </head>
@@ -66,10 +66,9 @@
           <h2>📌 Recent Shortened URLs</h2>
 
           <ul id="shortened_urls" class="links-list">
-           <% Links.map(({shortCode, url , id}) => { %> 
-            <% const newURL = url.length >= 40 ? url.slice(0, 40) + "..." : url; %>
+            <% Links.map(({shortCode, url , id}) => { %> <% const newURL =
+            url.length >= 40 ? url.slice(0, 40) + "..." : url; %>
             <li class="link-item">
-
               <a href="/<%= shortCode %>" target="_blank">
                 <%= host %>/<%= shortCode %>
               </a>
@@ -77,8 +76,12 @@
               <div class="link-actions">
                 <span class="full-url" title="<%= url %>"><%= newURL %></span>
 
-                <i class="fa fa-clone" id="copy-btn"
-                  data-url="<%= host %>/<%= shortCode %>" aria-hidden="true"></i>
+                <i
+                  class="fa fa-clone"
+                  id="copy-btn"
+                  data-url="<%= host %>/<%= shortCode %>"
+                  aria-hidden="true"
+                ></i>
 
                 <a href="/edit/<%= id %>">
                   <i class="fa fa-pencil" aria-hidden="true"></i>
@@ -89,12 +92,28 @@
                     <i class="fa fa-trash" aria-hidden="true"></i>
                   </button>
                 </form>
-
               </div>
             </li>
             <% }) %>
           </ul>
         </section>
+        <% if(totalPage > 1 ) { %>
+        <div class="pagination">
+          <% if(currentPage > 1 ) { %>
+          <a href="?page=<%= currentPage - 1 %>">
+            <button>Prev</button>
+          </a>
+          <% } %>
+
+          <span><%= currentPage %></span>
+
+          <% if(currentPage < totalPage ) { %>
+          <a href="?page=<%= currentPage + 1 %>">
+            <button>Next</button>
+          </a>
+          <% } %>
+        </div>
+        <% } %>
       </div>
     </main>
     <script>
@@ -105,7 +124,8 @@
           btn.addEventListener("click", () => {
             const url = btn.getAttribute("data-url");
             navigator.clipboard
-              .writeText(url).then(() => alert("Copied successfully!"))
+              .writeText(url)
+              .then(() => alert("Copied successfully!"))
               .catch((err) => {
                 alert("Failed to copy: " + err);
               });

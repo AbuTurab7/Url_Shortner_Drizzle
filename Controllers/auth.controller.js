@@ -390,7 +390,6 @@ export const getGoogleLogin = async (req , res) => {
 //getGoogleLoginCallback
 export const getGoogleLoginCallback = async (req, res) => {
   const { code, state } = req.query;
-  console.log(code, state);
 
   const {
     google_oauth_state: storedState,

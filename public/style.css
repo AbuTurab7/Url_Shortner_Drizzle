@@ -199,6 +199,49 @@ form {
   transform: translateY(-1px);
 }
 
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 2rem;
+  font-family: 'Urbanist', sans-serif;
+}
+
+.pagination a {
+  text-decoration: none;
+}
+
+.pagination button {
+  background: #4f46e5; /* Indigo tone */
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover {
+  background: #4338ca;
+  transform: translateY(-2px);
+}
+
+.pagination span {
+  background: #f3f4f6; /* Light gray */
+  color: #111827;      /* Dark text */
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  min-width: 36px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+
 /* Auth Pages (Login/Register) */
 .auth-main-container {
   min-height: 100vh;
