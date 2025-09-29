@@ -19,6 +19,8 @@ import {
   postResetPassword,
   getGoogleLogin,
   getGoogleLoginCallback,
+  getGithubLogin,
+  getGithubLoginCallback,
 } from "../Controllers/auth.controller.js";
 
 const authRouter = Router();
@@ -48,5 +50,9 @@ authRouter.route("/reset-password/:token").get(getResetPassword).post(postResetP
 authRouter.route("/google").get(getGoogleLogin);
 
 authRouter.route("/google/callback").get(getGoogleLoginCallback);
+
+authRouter.route("/github").get(getGithubLogin);
+
+authRouter.route("/github/callback").get(getGithubLoginCallback);
 
 export default authRouter;
