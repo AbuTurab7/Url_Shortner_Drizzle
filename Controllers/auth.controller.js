@@ -44,6 +44,7 @@ import { OAUTH_EXCHANGE_EXPIRY } from "../config/constant.js";
 import { decodeIdToken, generateCodeVerifier, generateState } from "arctic";
 import { google } from "../lib/oauth/google.js";
 import { github } from "../lib/oauth/github.js";
+import { error } from "console";
 
 //registration page
 //get
@@ -134,6 +135,7 @@ export const getProfile = async (req, res) => {
       name: user.name,
       email: user.email,
       isEmailValid: user.isEmailValid,
+      hasPassword: Boolean(user.password),
       createdAt: user.createdAt,
       links: userShortLinks,
     },
@@ -554,3 +556,40 @@ export const getGithubLoginCallback = async (req, res) => {
 
   res.redirect("/");
 };
+
+
+// Set Password Page 
+// get
+
+export const getSetPassword = async (req , res) => {
+  if (!req.user) return res.send(`<h1>You are not logged in</h1>`);
+  return res.render("auth/setPassword" , {
+    errors: req.flash("errors")
+  });
+};
+
+//post
+export const postSetPassword = async (req , res) => {
+  if (!req.user) return res.send(`<h1>You are not logged in</h1>`);
+
+  const { data , error } = resetPasswordVerification.safeParse(req.body);
+
+  if (error) {
+    const errorMessage = error.issues[0].message;
+    req.flash("errors", errorMessage);
+    return res.redirect(`/set-password`);
+  }
+
+  const user = await findUserById(req.user.id);
+
+  if(user.password){
+   req.flash("errors" , "You already have your Password, Instead Change your password");
+   return res.redirect("/set-password");
+  }
+
+  const hashedPassword = await getHashPassword(data.confirmPassword);
+  await updateUserPassword(req.user.id, hashedPassword);
+
+  req.flash("success" , "Password set successfully!");
+  return res.redirect("/profile");
+}
