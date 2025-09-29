@@ -18,6 +18,9 @@ import {
   getForgetPasswordLink,
   getResetPasswordData,
   deleteUserTokenData,
+  getUserWithOauthId,
+  linkUserWithOauth,
+  createUserWithOauth,
 } from "../services/auth.services.controller.js";
 import { getShortLinkByUserId } from "../services/services.controller.js";
 import {
@@ -37,6 +40,9 @@ import ejs, { name } from "ejs";
 import mjml2html from "mjml";
 import { success } from "zod";
 import { asc } from "drizzle-orm";
+import { OAUTH_EXCHANGE_EXPIRY } from "../config/constant.js";
+import { decodeIdToken, generateCodeVerifier, generateState } from "arctic";
+import { google } from "../lib/oauth/google.js";
 
 //registration page
 //get
@@ -90,6 +96,11 @@ export const postlogin = async (req, res) => {
 
     if (!user) {
       req.flash("errors", "Invalid email or password");
+      return res.redirect("/login");
+    }
+
+    if(!user.password){
+      req.flash("errors", "You have created account using social login. Please login with your social account.");
       return res.redirect("/login");
     }
 
@@ -344,3 +355,181 @@ export const postResetPassword = async (req, res) => {
   req.flash("success", "Password changed successfully!");
   return res.redirect("/login");
 };
+
+
+export const getGoogleLogin = async (req , res) => {
+  if(req.user) return res.redirect("/");
+
+  const state = generateState();
+  const codeVerifier = generateCodeVerifier();
+
+  const url = google.createAuthorizationURL(state , codeVerifier , [
+    "openid",
+    "profile",
+    "email",
+  ]);
+
+  const cookieConfig = {
+    httpOnly: true,
+    secure: true,
+    maxAge: OAUTH_EXCHANGE_EXPIRY,
+    sameSite: "lax"
+  };
+
+  res.cookie("google_oauth_state" , state , cookieConfig);
+  res.cookie("google_code_verifier" , codeVerifier , cookieConfig);
+
+  res.redirect(url.toString());
+};
+
+
+//getGoogleLoginCallback
+export const getGoogleLoginCallback = async (req, res) => {
+  const { code, state } = req.query;
+  console.log(code, state);
+
+  const {
+    google_oauth_state: storedState,
+    google_code_verifier: codeVerifier,
+  } = req.cookies;
+
+  if (
+    !code ||
+    !state ||
+    !storedState ||
+    !codeVerifier ||
+    state !== storedState
+  ) {
+    req.flash(
+      "errors",
+      "Couldn't login with Google because of invalid login attempt. Please try again!"
+    );
+    return res.redirect("/login");
+  }
+
+  let tokens;
+  try {
+    // arctic will verify the code given by google with code verifier internally
+    tokens = await google.validateAuthorizationCode(code, codeVerifier);
+  } catch {
+    req.flash(
+      "errors",
+      "Couldn't login with Google because of invalid login attempt. Please try again!"
+    );
+    return res.redirect("/login");
+  }
+
+  const claims = decodeIdToken(tokens.idToken());
+  
+  const { sub: googleUserId, name, email, } = claims;
+
+  let user = await getUserWithOauthId({
+    provider: "google",
+    email,
+  });
+
+  // if user exists but user is not linked with oauth
+  if (user && !user.providerAccountId) {
+    await linkUserWithOauth({
+      userId: user.id,
+      provider: "google",
+      providerAccountId: googleUserId,
+      // avatarUrl: picture,
+    });
+  }
+
+  // if user doesn't exist
+  if (!user) {
+    user = await createUserWithOauth({
+      name,
+      email,
+      provider: "google",
+      providerAccountId: googleUserId,
+      // avatarUrl: picture,
+    });
+  }
+  await authenticateUser({ req, res, user, name, email });
+
+  res.redirect("/");
+};
+
+
+
+//getGithubLoginCallback
+// export const getGithubLoginCallback = async (req, res) => {
+//   const { code, state } = req.query;
+//   const { github_oauth_state: storedState } = req.cookies;
+
+//   function handleFailedLogin() {
+//     req.flash(
+//       "errors",
+//       "Couldn't login with GitHub because of invalid login attempt. Please try again!"
+//     );
+//     return res.redirect("/login");
+//   }
+
+//   if (!code || !state || !storedState || state !== storedState) {
+//     return handleFailedLogin();
+//   }
+
+//   let tokens;
+//   try {
+//     tokens = await github.validateAuthorizationCode(code);
+//   } catch {
+//     return handleFailedLogin();
+//   }
+
+//   const githubUserResponse = await fetch("https://api.github.com/user", {
+//     headers: {
+//       Authorization: `Bearer ${tokens.accessToken()}`,
+//     },
+//   });
+//   if (!githubUserResponse.ok) return handleFailedLogin();
+//   const githubUser = await githubUserResponse.json();
+//   const { id: githubUserId, name } = githubUser;
+
+//   const githubEmailResponse = await fetch(
+//     "https://api.github.com/user/emails",
+//     {
+//       headers: {
+//         Authorization: `Bearer ${tokens.accessToken()}`,
+//       },
+//     }
+//   );
+//   if (!githubEmailResponse.ok) return handleFailedLogin();
+
+//   const emails = await githubEmailResponse.json();
+//   const email = emails.filter((e) => e.primary)[0].email; // In GitHub we can have multiple emails, but we only want primary email
+//   if (!email) return handleFailedLogin();
+
+//   // there are few things that we should do
+//   //! Condition 1: User already exists with github's oauth linked
+//   //! Condition 2: User already exists with the same email but google's oauth isn't linked
+//   //! Condition 3: User doesn't exist.
+
+//   let user = await getUserWithOauthId({
+//     provider: "github",
+//     email,
+//   });
+
+//   if (user && !user.providerAccountId) {
+//     await linkUserWithOauth({
+//       userId: user.id,
+//       provider: "github",
+//       providerAccountId: githubUserId,
+//     });
+//   }
+
+//   if (!user) {
+//     user = await createUserWithOauth({
+//       name,
+//       email,
+//       provider: "github",
+//       providerAccountId: githubUserId,
+//     });
+//   }
+
+//   await authenticateUser({ req, res, user, name, email });
+
+//   res.redirect("/");
+// };

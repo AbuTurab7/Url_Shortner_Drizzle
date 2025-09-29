@@ -308,6 +308,67 @@ form {
   border: none;
 }
 
+/* Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.auth-divider span {
+  background: #fff;
+  padding: 0 10px;
+  font-size: 0.9rem;
+  color: var(--gray);
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #ddd;
+}
+
+/* Social Login */
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.social-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+.google-btn , .github-btn {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #444;
+}
+
+.google-btn:hover , .github-btn:hover {
+  background: #f5f5f5;
+  transform: translateY(-1px);
+}
+
+
 .flash-success,
 .flash-error {
   width: 100%;

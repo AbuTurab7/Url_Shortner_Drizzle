@@ -17,6 +17,8 @@ import {
   postForgetPassword,
   getResetPassword,
   postResetPassword,
+  getGoogleLogin,
+  getGoogleLoginCallback,
 } from "../Controllers/auth.controller.js";
 
 const authRouter = Router();
@@ -42,5 +44,9 @@ authRouter.route("/logout").get(getLogout);
 authRouter.route("/forget-password").get(getForgetPassword).post(postForgetPassword);
 
 authRouter.route("/reset-password/:token").get(getResetPassword).post(postResetPassword);
+
+authRouter.route("/google").get(getGoogleLogin);
+
+authRouter.route("/google/callback").get(getGoogleLoginCallback);
 
 export default authRouter;

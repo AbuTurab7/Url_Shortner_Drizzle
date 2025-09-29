@@ -4,7 +4,7 @@ import { shortnerValidation } from "../validation/shortner-validation.js";
 import z from "zod";
 
 export const getShortenURL = async (req, res) => {
-  if(!req.user) return res.redirect("/register");
+  if(!req.user) return res.redirect("/login");
   const Links = await getLinks(req.user.id);
   
   res.render("index", { Links, host: req.host , errors: req.flash("errors") , success : req.flash("success")});

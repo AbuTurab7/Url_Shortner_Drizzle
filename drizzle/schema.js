@@ -6,6 +6,7 @@ import {
   timestamp,
   varchar,
   text,
+  mysqlEnum,
 } from "drizzle-orm/mysql-core";
 
 //shortLinksTable
@@ -69,6 +70,18 @@ export const passwordResetTokensTable = mysqlTable("password_reset_tokens", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+//oauthAccountsTable
+export const oauthAccountsTable = mysqlTable("oauth_accounts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  provider: mysqlEnum("provider", ["google", "github"]).notNull(),
+  providerAccountId: varchar("provider_account_id", { length: 255 })
+    .notNull()
+    .unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
 
 // A user can have many short links
 export const usersRelation = relations(usersTable, ({ many }) => ({

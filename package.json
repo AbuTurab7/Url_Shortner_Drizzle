@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "arctic": "^3.7.0",
     "argon2": "^0.44.0",
     "bcrypt": "^6.0.0",
     "connect-flash": "^0.1.1",

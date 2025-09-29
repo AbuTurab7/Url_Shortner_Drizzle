@@ -14,10 +14,11 @@
       <h2 class="auth-title">Welcome Back 👋</h2>
       <p class="auth-subtitle">Login to continue to <strong>URLShort</strong></p>
 
-      <% if(success || success.length >= 0) { %> <%
-          success.forEach((success) => { %>
-          <p class="flash-success"><%= success %></p>
-          <% })} %>
+      <% if(success && success.length > 0) { %>
+        <% success.forEach((msg) => { %>
+          <p class="flash-success"><%= msg %></p>
+        <% }) %>
+      <% } %>
       
       <form action="/login" method="POST" class="auth-form">
         <div class="auth-input-box">
@@ -26,10 +27,12 @@
         <div class="auth-input-box">
           <input type="password" name="password" id="password" placeholder="Password" required />
         </div>
-        <% if(errors || errors.length >= 0) { %>
-         <% errors.forEach((error) => { %>
-          <p class="flash-error"><%= error %></p>
-        <%  });} %>
+        <% if(errors && errors.length > 0) { %>
+          <% errors.forEach((error) => { %>
+            <p class="flash-error"><%= error %></p>
+          <% }) %>
+        <% } %>
+        
         <button type="submit" class="auth-btn">Login</button>
         
         <div class="auth-links">
@@ -38,6 +41,23 @@
           <a href="/register" class="link">Sign Up</a>
         </div>
       </form>
+
+      <!-- Divider -->
+      <div class="auth-divider">
+        <span>or</span>
+      </div>
+
+      <!-- Social Login -->
+      <div class="social-login">
+        <a href="/google" class="social-btn google-btn">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" />
+          Login with Google
+        </a>
+        <a href="/auth/github" class="social-btn github-btn">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" />
+          Login with GitHub
+        </a>
+      </div>
     </div>
   </div>
 </body>
