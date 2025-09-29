@@ -134,6 +134,7 @@ export const getProfile = async (req, res) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      avatarUrl: user.avatarUrl,
       isEmailValid: user.isEmailValid,
       hasPassword: Boolean(user.password),
       createdAt: user.createdAt,
@@ -424,7 +425,7 @@ export const getGoogleLoginCallback = async (req, res) => {
 
   const claims = decodeIdToken(tokens.idToken());
   
-  const { sub: googleUserId, name, email, } = claims;
+  const { sub: googleUserId, name, email, picture } = claims;
 
   let user = await getUserWithOauthId({
     provider: "google",
@@ -437,7 +438,7 @@ export const getGoogleLoginCallback = async (req, res) => {
       userId: user.id,
       provider: "google",
       providerAccountId: googleUserId,
-      // avatarUrl: picture,
+      avatarUrl: picture,
     });
   }
 
@@ -448,7 +449,7 @@ export const getGoogleLoginCallback = async (req, res) => {
       email,
       provider: "google",
       providerAccountId: googleUserId,
-      // avatarUrl: picture,
+      avatarUrl: picture,
     });
   }
   await authenticateUser({ req, res, user, name, email });
@@ -509,7 +510,7 @@ export const getGithubLoginCallback = async (req, res) => {
   });
   if (!githubUserResponse.ok) return handleFailedLogin();
   const githubUser = await githubUserResponse.json();
-  const { id: githubUserId, name } = githubUser;
+  const { id: githubUserId, name , avatar_url} = githubUser;
 
   const githubEmailResponse = await fetch(
     "https://api.github.com/user/emails",
@@ -525,11 +526,6 @@ export const getGithubLoginCallback = async (req, res) => {
   const email = emails.filter((e) => e.primary)[0].email; // In GitHub we can have multiple emails, but we only want primary email
   if (!email) return handleFailedLogin();
 
-  // there are few things that we should do
-  //! Condition 1: User already exists with github's oauth linked
-  //! Condition 2: User already exists with the same email but google's oauth isn't linked
-  //! Condition 3: User doesn't exist.
-
   let user = await getUserWithOauthId({
     provider: "github",
     email,
@@ -540,6 +536,7 @@ export const getGithubLoginCallback = async (req, res) => {
       userId: user.id,
       provider: "github",
       providerAccountId: githubUserId,
+      avatarUrl: avatar_url,
     });
   }
 
@@ -549,6 +546,7 @@ export const getGithubLoginCallback = async (req, res) => {
       email,
       provider: "github",
       providerAccountId: githubUserId,
+      avatarUrl: avatar_url,
     });
   }
 
