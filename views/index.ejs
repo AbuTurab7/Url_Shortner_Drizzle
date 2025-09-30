@@ -105,13 +105,44 @@
           </a>
           <% } %>
 
-          <span><%= currentPage %></span>
+         <% let sp = Math.max(1 , currentPage - 2); %>
+         <% let ep = Math.min(totalPage , currentPage + 2); %>
 
-          <% if(currentPage < totalPage ) { %>
+        <% if( sp > 1){ %>
+          <a href="?page=1">
+            <span>1</span>
+          </a>
+         <% if(sp > 2) { %>
+          <p>...</p>
+        <% } %>
+        <% } %>
+
+        <% for(let i = sp ; i <= ep ; i++){ %>
+         <% if(i === currentPage){ %>
+            <span id="activePage"><%= i %></span>
+          <% } else { %>
+            <a href="?page=<%=i %>">
+            <span><%= i %></span>
+          </a>
+         <% } %>
+         <% } %>
+
+         <% if(ep < totalPage){ %>
+        <%  if(ep < totalPage - 1){ %>
+            <p>...</p>
+         <% } %>
+          <a href="?page=<%= totalPage %>">
+            <span><%= totalPage %></span>
+          </a>
+        <% } %>
+          <% } %> 
+
+           <% if(currentPage < totalPage ) { %>
           <a href="?page=<%= currentPage + 1 %>">
             <button>Next</button>
           </a>
-          <% } %>
+          
+
         </div>
         <% } %>
       </div>

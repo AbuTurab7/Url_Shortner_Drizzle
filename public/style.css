@@ -225,9 +225,10 @@ form {
   transition: all 0.2s ease;
 }
 
-.pagination button:hover {
+.pagination button:hover , .pagination span:hover  {
   background: #4338ca;
   transform: translateY(-2px);
+  color: white;
 }
 
 .pagination span {
@@ -239,6 +240,10 @@ form {
   min-width: 36px;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+#activePage{
+  background: #4f46e5;
+  color: white;
 }
 
 
