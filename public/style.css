@@ -726,6 +726,17 @@ form {
   border-bottom: 2px solid #007bff;
 }
 
+.avatar-preview-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+#avatar-preview-img{
+  height: 150px;
+  width: 150px;
+  object-fit: contain;
+}
 
 
 /* verify-email Page */

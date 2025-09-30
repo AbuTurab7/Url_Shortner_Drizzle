@@ -196,8 +196,11 @@ export const clearVerifyEmailToken = async (userId) => {
     .where(verifyEmailTokensTable.userId, userId);
 };
 
-export const updateProfile = async ({ userId, name }) => {
-  return db.update(usersTable).set({ name }).where(eq(usersTable.id, userId));
+export const updateProfile = async ({ userId, name, avatarUrl }) => {
+  return db
+    .update(usersTable)
+    .set({ name, avatarUrl })
+    .where(eq(usersTable.id, userId));
 };
 
 export const findUserByEmail = async (email) => {
@@ -245,9 +248,6 @@ export const deleteUserTokenData = async (userId) => {
     .delete(passwordResetTokensTable)
     .where(eq(passwordResetTokensTable.userId, userId));
 };
-
-
-
 
 export async function getUserWithOauthId({ email, provider }) {
   const [user] = await db
@@ -305,7 +305,7 @@ export async function createUserWithOauth({
       .values({
         email,
         name,
-        // password: "", 
+        // password: "",
         avatarUrl,
         isEmailValid: true, // we know that google's email are valid
       })

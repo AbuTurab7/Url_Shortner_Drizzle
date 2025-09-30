@@ -216,9 +216,14 @@ export const getVerifyEmailToken = async (req, res) => {
 export const getEditProfile = async (req, res) => {
   if (!req.user) return res.send(`<h1>You are not logged in</h1>`);
 
+  const user = await findUserById(req.user.id);
+  if (!user) return res.send(`<h1>You are not logged in</h1>`);
+
   return res.render("auth/editProfile", {
     user: req.user,
+    avatarUrl: user.avatarUrl,
     errors: req.flash("errors"),
+    success: req.flash("success"),
   });
 };
 //post
@@ -233,8 +238,10 @@ export const postEditProfile = async (req, res) => {
     return res.redirect("/edit-profile");
   }
 
-  await updateProfile({ userId: req.user.id, name: data.name });
+  const fileUrl = req.file ? `uploads/avatar/${req.file.filename}` : undefined;
 
+  await updateProfile({ userId: req.user.id, name: data.name , avatarUrl: fileUrl });
+  req.flash("success", "Profile updated successfully!")
   return res.redirect("/profile");
 };
 

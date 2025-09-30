@@ -1,4 +1,6 @@
 import { Router } from "express";
+import multer from "multer";
+import path from "path";
 import {
   getRegister,
   postRegister,
@@ -39,7 +41,31 @@ authRouter.route("/resend-verification-link").post(postResendVerificationLink);
 
 authRouter.route("/verify-email-token").get(getVerifyEmailToken);
 
-authRouter.route("/edit-profile").get(getEditProfile).post(postEditProfile);
+const avatarStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/uploads/avatar");
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${Date.now()}_${Math.random()}${ext}`);
+  },
+});
+
+const avatarFileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only image files are allowed!"), false);
+  }
+};
+
+const avatarUpload = multer({
+  storage: avatarStorage,
+  fileFilter: avatarFileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5mb
+});
+
+authRouter.route("/edit-profile").get(getEditProfile).post( avatarUpload.single("avatar"), postEditProfile);
 
 authRouter.route("/change-password").get(getChangePassword).post(postChangePassword);
 
