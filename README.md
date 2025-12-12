@@ -19,8 +19,8 @@ This project allows users to shorten long URLs into compact, shareable links and
 
 **Backend**  
 - Drizzle ORM (for database modeling and queries)  
-- Node.js / Express.js   
-**Frontend **  
+- Node.js / Express.js 
+**Frontend** 
 - EJS  
 ---
 
