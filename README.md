@@ -1,6 +1,6 @@
 # Url_Shortner_Drizzle
 
-A modern **URL Shortener Web Application** built with Drizzle ORM and a web framework (e.g., Node.js/Express or Next.js).  
+A modern **URL Shortener Web Application** built with Drizzle ORM and a web framework (Node.js/Express). 
 This project allows users to shorten long URLs into compact, shareable links and automatically redirects users from the short URL to the original link.
 
 ---
